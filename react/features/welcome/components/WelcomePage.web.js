@@ -201,6 +201,31 @@ class WelcomePage extends AbstractWelcomePage {
 		);
 	}
 
+	_checkChatToken() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const chat_token = urlParams.get('token');
+		if (!chat_token) {
+			return 0;
+		}
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: 'https://engine.shadecubecommunicator.com/accounts/profile/',
+				method: 'GET',
+				headers: {
+					Authorization: 'Bearer ' + chat_token,
+					'Content-Type': 'application/json'
+				}
+			})
+				.done((data) => {
+					window.chat_token = chat_token;
+					resolve(1);
+				})
+				.fail((err) => {
+					reject(0);
+				});
+		}).catch((err) => {});
+	}
+
 	/**
      * Prevents submission of the form and delegates join logic.
      *
@@ -208,9 +233,13 @@ class WelcomePage extends AbstractWelcomePage {
      * @private
      * @returns {void}
      */
-	_onFormSubmit(event) {
+	async _onFormSubmit(event) {
 		event.preventDefault();
-
+		let chat_access = await this._checkChatToken();
+		if (!chat_access) {
+			alert('No rights to start a meeting');
+			return;
+		}
 		if (!this._roomInputRef || this._roomInputRef.reportValidity()) {
 			this._onJoin();
 		}
