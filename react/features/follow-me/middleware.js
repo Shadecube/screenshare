@@ -54,6 +54,7 @@ let nextOnStageTimer = 0;
  * non-moderator participant.
  */
 MiddlewareRegistry.register(store => next => action => {
+    const oldState = store.getState();
     switch (action.type) {
     case CONFERENCE_WILL_JOIN: {
         const { conference } = action;

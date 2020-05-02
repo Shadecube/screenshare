@@ -9,6 +9,7 @@ import { connect } from '../../../base/redux';
 
 import {
     MuteButton,
+    AllowScreenShareButton,
     MuteEveryoneElseButton,
     KickButton,
     PrivateMessageMenuButton,
@@ -169,6 +170,12 @@ class RemoteVideoMenuTriggerButton extends Component<Props> {
         const buttons = [];
 
         if (_isModerator) {
+            buttons.push(
+                <AllowScreenShareButton
+                    isAudioMuted = { isAudioMuted }
+                    key = 'allow-screen'
+                    participantID = { participantID } />
+            );
             buttons.push(
                 <MuteButton
                     isAudioMuted = { isAudioMuted }

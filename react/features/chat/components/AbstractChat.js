@@ -7,6 +7,8 @@ import { getLocalParticipant } from '../../base/participants';
 
 import { sendMessage, toggleChat } from '../actions';
 
+import { CHAT_CODE } from '../../base/conference';
+
 /**
  * The type of the React {@code Component} props of {@code AbstractChat}.
  */
@@ -105,10 +107,11 @@ export function _mapDispatchToProps(dispatch: Dispatch<any>) {
 export function _mapStateToProps(state: Object) {
     const { isOpen, messages } = state['features/chat'];
     const _localParticipant = getLocalParticipant(state);
+    const filteredMessages = messages.filter(message => !message.message.startsWith(CHAT_CODE.PATTERN_START))
 
     return {
         _isOpen: isOpen,
-        _messages: messages,
+        _messages: filteredMessages,
         _showNamePrompt: !_localParticipant.name
     };
 }

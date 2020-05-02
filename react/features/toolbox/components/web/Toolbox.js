@@ -26,7 +26,8 @@ import {
 import {
     getLocalParticipant,
     getParticipants,
-    participantUpdated
+    participantUpdated,
+    PARTICIPANT_ROLE
 } from '../../../base/participants';
 import { connect, equals } from '../../../base/redux';
 import { OverflowMenuItem } from '../../../base/toolbox';
@@ -84,6 +85,8 @@ import VideoMuteButton from '../VideoMuteButton';
 import {
     ClosedCaptionButton
 } from '../../../subtitles';
+
+import { CHAT_CODE } from '../../../base/conference/constants'
 
 /**
  * The type of the React {@code Component} props of {@link Toolbox}.
@@ -190,7 +193,19 @@ type Props = {
     /**
      * Invoked to obtain translated strings.
      */
-    t: Function
+    t: Function,
+
+    /**
+     * List of chat messages.
+     */
+    _messages: Array,
+
+    /**
+     * Flag showing whether participant is morderator or not.
+     */
+    _isModerator: Boolean,
+
+    
 };
 
 /**
@@ -201,7 +216,12 @@ type State = {
     /**
      * The width of the browser's window.
      */
-    windowWidth: number
+    windowWidth: number,
+
+    /**
+     * screen share enabled for the participant.
+     */
+    screenShareEnabled: Boolean
 };
 
 declare var APP: Object;
@@ -252,7 +272,8 @@ class Toolbox extends Component<Props, State> {
         this._onShortcutToggleTileView = this._onShortcutToggleTileView.bind(this);
 
         this.state = {
-            windowWidth: window.innerWidth
+            windowWidth: window.innerWidth,
+            screenShareEnabled: false
         };
     }
 
@@ -326,6 +347,11 @@ class Toolbox extends Component<Props, State> {
             this._onSetOverflowVisible(false);
             this.props.dispatch(setToolbarHovered(false));
         }
+
+        if(prevProps._messages !== this.props._messages){
+            this._onMessageRecieved()
+        }
+
     }
 
     /**
@@ -659,13 +685,63 @@ class Toolbox extends Component<Props, State> {
      * @returns {void}
      */
     _onShortcutToggleScreenshare() {
-        sendAnalytics(createToolbarEvent(
-            'screen.sharing',
-            {
-                enable: !this.props._screensharing
-            }));
+        if(this.props._isModerator || this.state.screenShareEnabled ){
+            sendAnalytics(createToolbarEvent(
+                'screen.sharing',
+                {
+                    enable: !this.props._screensharing
+                }));
+    
+            this._doToggleScreenshare();
+        }
+    }
 
-        this._doToggleScreenshare();
+    _onMessageRecieved: () => void;
+    /**
+     * allow screen share to participant.
+     *
+     * @private
+     * @returns {void}
+     */
+    _onMessageRecieved() {
+        const {
+            _messages,
+            _participants,
+            _localParticipantID
+        } = this.props
+        const {
+            PATTERN_START,
+            ENABLE_SCREEN_SHARE,
+            DISABLE_SCREEN_SHARE
+        } = CHAT_CODE
+        const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
+        
+        const messages  = _messages.filter(message => message?.id === morderator?.id && message.message.startsWith(PATTERN_START) )
+                            .sort((a, b) => b.timestamp - a.timestamp);
+
+        if(messages.length ){
+            switch (messages[0].message) {
+                case `${ENABLE_SCREEN_SHARE}--${_localParticipantID}`:
+                    this.setState({
+                        screenShareEnabled: true
+                    })
+                    break;
+            
+                case `${DISABLE_SCREEN_SHARE}--${_localParticipantID}`:
+                    if(this.props._screensharing){
+                        this._onToolbarToggleScreenshare(false)
+                    }
+                    this.setState({
+                        screenShareEnabled: false
+                    })
+                
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+        // this.props.dispatch(openKeyboardShortcutsDialog());
     }
 
     _onToolbarOpenFeedback: () => void;
@@ -1210,7 +1286,8 @@ class Toolbox extends Component<Props, State> {
             <div className = 'toolbox-content'>
                 <div className = 'button-group-left'>
                     { buttonsLeft.indexOf('desktop') !== -1
-                        && this._renderDesktopSharingButton() }
+                        && (this.props._isModerator || this.state.screenShareEnabled ) &&
+                        this._renderDesktopSharingButton() }
                     { buttonsLeft.indexOf('raisehand') !== -1
                         && <ToolbarButton
                             accessibilityLabel = { t('toolbar.accessibilityLabel.raiseHand') }
@@ -1339,6 +1416,9 @@ function _mapStateToProps(state) {
     // override them we'd miss it.
     const buttons = new Set(interfaceConfig.TOOLBAR_BUTTONS);
 
+    const participant = getLocalParticipant(state);
+    const _isModerator = Boolean(participant?.role === PARTICIPANT_ROLE.MODERATOR)
+
     return {
         _chatOpen: state['features/chat'].isOpen,
         _conference: conference,
@@ -1360,7 +1440,10 @@ function _mapStateToProps(state) {
             || sharedVideoStatus === 'start'
             || sharedVideoStatus === 'pause',
         _visible: isToolboxVisible(state),
-        _visibleButtons: equals(visibleButtons, buttons) ? visibleButtons : buttons
+        _visibleButtons: equals(visibleButtons, buttons) ? visibleButtons : buttons,
+        _isModerator,
+        _messages: state['features/chat'].messages,
+        _participants: getParticipants(state)
     };
 }
 

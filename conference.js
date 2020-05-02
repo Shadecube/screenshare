@@ -50,7 +50,8 @@ import {
     onStartMutedPolicyChanged,
     p2pStatusChanged,
     sendLocalParticipant,
-    setDesktopSharingEnabled
+    setDesktopSharingEnabled,
+    shadeCubeApis
 } from './react/features/base/conference';
 import {
     checkAndNotifyForNewDevice,
@@ -92,7 +93,8 @@ import {
     participantMutedUs,
     participantPresenceChanged,
     participantRoleChanged,
-    participantUpdated
+    participantUpdated,
+    PARTICIPANT_ROLE
 } from './react/features/base/participants';
 import {
     getUserSelectedCameraDeviceId,
@@ -123,6 +125,7 @@ import { createPresenterEffect } from './react/features/stream-effects/presenter
 import { endpointMessageReceived } from './react/features/subtitles';
 import { createRnnoiseProcessorPromise } from './react/features/rnnoise';
 import { toggleScreenshotCaptureEffect } from './react/features/screenshot-capture';
+import { changeShadeCubeCheckFlag } from './react/features/shade-cube-auth';
 
 const logger = require('jitsi-meet-logger').getLogger(__filename);
 
@@ -2680,8 +2683,32 @@ export default {
      * @param {boolean} [requestFeedback=false] if user feedback should be
      * requested
      */
-    hangup(requestFeedback = false) {
+    async hangup(requestFeedback = false) {
         eventEmitter.emit(JitsiMeetConferenceEvents.BEFORE_HANGUP);
+
+        const state = APP.store.getState()
+        const participant = getLocalParticipant(state)
+        if(participant){
+            if(participant?.role === PARTICIPANT_ROLE.MODERATOR){
+                const token = state['features/shade-cube-auth'].token
+                const room = state['features/base/conference'].room
+                
+                await fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: room,
+                        "is_active": false
+                    })
+                }).then(res => res.json())
+
+                APP.store.dispatch(changeShadeCubeCheckFlag())
+                
+            }
+        }
 
         this._stopProxyConnection();
 

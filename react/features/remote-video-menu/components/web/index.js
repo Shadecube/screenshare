@@ -20,3 +20,5 @@ export {
     default as RemoteVideoMenuTriggerButton
 } from './RemoteVideoMenuTriggerButton';
 export { default as VolumeSlider } from './VolumeSlider';
+
+export { default as AllowScreenShareButton } from './AllowScreenShareButton';

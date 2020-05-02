@@ -31,6 +31,9 @@ import {
     abstractMapStateToProps
 } from '../AbstractConference';
 import type { AbstractProps } from '../AbstractConference';
+import { PARTICIPANT_ROLE, participantUpdated, getParticipants, getLocalParticipant } from '../../../base/participants';
+import { shadeCubeApis } from '../../../base/conference';
+import { maybeRedirectToWelcomePage } from '../../../app';
 
 declare var APP: Object;
 declare var config: Object;
@@ -121,9 +124,29 @@ class Conference extends AbstractConference<Props, *> {
      */
     componentDidMount() {
         document.title = interfaceConfig.APP_NAME;
-        this._start();
+        
+        this._checkShadeCubeRoomStatus(this._start());
     }
 
+    _checkShadeCubeRoomStatus = (cb) => {
+        const room = window.location.pathname.replace("/", "");
+        fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`).then(res => res.json())
+        .then(res => {
+            if(res.is_active){
+                if(typeof cb === "function"){
+                    cb();
+                }
+            }else{
+                // this.props.dispatch(maybeRedirectToWelcomePage())
+                window.location.href = "/"
+            }
+        })
+        .catch(()=> {
+            // this.props.dispatch(maybeRedirectToWelcomePage())
+            window.location.href= "/"
+        })
+    }
+    
     /**
      * Calls into legacy UI to update the application layout, if necessary.
      *
@@ -141,6 +164,9 @@ class Conference extends AbstractConference<Props, *> {
         // are in react they should calculate size on their own as much as
         // possible and pass down sizings.
         VideoLayout.refreshLayout();
+        if(this.props._auth.checkFlag !== prevProps._auth.checkFlag){
+            this._checkShadeCubeRoomStatus()
+        }
     }
 
     /**
@@ -263,7 +289,11 @@ function _mapStateToProps(state) {
     return {
         ...abstractMapStateToProps(state),
         _iAmRecorder: state['features/base/config'].iAmRecorder,
-        _layoutClassName: LAYOUT_CLASSNAMES[currentLayout]
+        _layoutClassName: LAYOUT_CLASSNAMES[currentLayout],
+        _auth: state['features/shade-cube-auth'],
+        _participants: getParticipants(state),
+        _participant: getLocalParticipant(state),
+        
     };
 }
 

@@ -35,14 +35,16 @@ import {
 import {
     LOCAL_PARTICIPANT_DEFAULT_ID,
     PARTICIPANT_JOINED_SOUND_ID,
-    PARTICIPANT_LEFT_SOUND_ID
+    PARTICIPANT_LEFT_SOUND_ID,
+    PARTICIPANT_ROLE
 } from './constants';
 import {
     getFirstLoadableAvatarUrl,
     getLocalParticipant,
     getParticipantById,
     getParticipantCount,
-    getParticipantDisplayName
+    getParticipantDisplayName,
+    getParticipants
 } from './functions';
 import { PARTICIPANT_JOINED_FILE, PARTICIPANT_LEFT_FILE } from './sounds';
 
@@ -123,10 +125,22 @@ MiddlewareRegistry.register(store => next => action => {
     }
 
     case PARTICIPANT_LEFT:
+
+        const { conference, id } = action.participant;
+        const filterdState = getParticipants(store.getState()).filter(p =>
+            !(
+                p.id === id
+                    && p.conference === conference
+                    && (conference || p.local)))
+        const isMorderatorFound = filterdState.some(p => p?.role === PARTICIPANT_ROLE.MODERATOR)   
+        if(!isMorderatorFound){
+            window.location.href = "/"
+        }
         _maybePlaySounds(store, action);
         break;
 
     case PARTICIPANT_UPDATED:
+        console.log(action)
         return _participantJoinedOrUpdated(store, next, action);
     }
 
