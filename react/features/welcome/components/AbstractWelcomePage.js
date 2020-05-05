@@ -7,7 +7,8 @@ import type { Dispatch } from 'redux';
 import { createWelcomePageEvent, sendAnalytics } from '../../analytics';
 import { appNavigate } from '../../app';
 import { isCalendarEnabled } from '../../calendar-sync';
-import { isRoomValid } from '../../base/conference';
+import { isRoomValid, shadeCubeApis } from '../../base/conference';
+import { saveShadeCubeAuth } from '../../shade-cube-auth';
 
 /**
  * {@code AbstractWelcomePage}'s React {@code Component} prop types.
@@ -73,7 +74,8 @@ export class AbstractWelcomePage extends Component<Props, *> {
         joining: false,
         room: '',
         roomPlaceholder: '',
-        updateTimeoutId: undefined
+        updateTimeoutId: undefined,
+        isChecking: false,
     };
 
     /**
@@ -91,6 +93,7 @@ export class AbstractWelcomePage extends Component<Props, *> {
         this._onJoin = this._onJoin.bind(this);
         this._onRoomChange = this._onRoomChange.bind(this);
         this._updateRoomname = this._updateRoomname.bind(this);
+        this._saveShadeCubeAuth = this._saveShadeCubeAuth.bind(this)
     }
 
     /**
@@ -102,6 +105,7 @@ export class AbstractWelcomePage extends Component<Props, *> {
     componentDidMount() {
         this._mounted = true;
         sendAnalytics(createWelcomePageEvent('viewed', undefined, { value: 1 }));
+        this._saveShadeCubeAuth()
     }
 
     /**
@@ -113,6 +117,7 @@ export class AbstractWelcomePage extends Component<Props, *> {
     componentWillUnmount() {
         this._clearTimeouts();
         this._mounted = false;
+        this.abortController.abort();
     }
 
     _animateRoomnameChanging: (string) => void;
@@ -142,6 +147,58 @@ export class AbstractWelcomePage extends Component<Props, *> {
             animateTimeoutId,
             roomPlaceholder
         });
+    }
+
+
+    abortController = new window.AbortController();
+
+    _saveShadeCubeAuth: () => void;
+
+    /**
+     * save/updated the shade cube auth state
+     */
+
+    _saveShadeCubeAuth(){
+		const params = (new URL(document.location)).searchParams;
+		const token = params.get('token') || this.props._auth.token;
+        if(token){
+            this.setState({
+                isChecking: true
+            })
+			fetch(shadeCubeApis.PROFILE_API, {
+                signal: this.abortController.signal,
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			}).then(res => res.json()).then(res => {
+				console.log({res})
+				this.setState({
+					isChecking: false
+				})
+				if(res.user){
+                    this.props.dispatch(saveShadeCubeAuth({
+                        token, 
+                        user: res,
+                    }))
+				}else{
+                    this.props.dispatch(saveShadeCubeAuth({
+                        token: undefined, 
+                        user: null,
+                    }))
+                }
+			})
+			.catch((error) => {
+                if (error.name !== 'AbortError'){
+                    this.props.dispatch(saveShadeCubeAuth({
+                        token: undefined, 
+                        user: null,
+                    }))
+                }; 
+				this.setState({
+					isChecking: false
+				})
+			})
+		}
     }
 
     /**
@@ -246,13 +303,15 @@ export class AbstractWelcomePage extends Component<Props, *> {
  * @returns {{
  *     _calendarEnabled: boolean,
  *     _room: string,
- *     _settings: Object
+ *     _settings: Object,
+ *     _auth: Object
  * }}
  */
 export function _mapStateToProps(state: Object) {
     return {
         _calendarEnabled: isCalendarEnabled(state),
         _room: state['features/base/conference'].room,
-        _settings: state['features/base/settings']
+        _settings: state['features/base/settings'],
+        _auth: state['features/shade-cube-auth']
     };
 }

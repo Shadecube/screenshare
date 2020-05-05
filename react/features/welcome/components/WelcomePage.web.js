@@ -12,7 +12,10 @@ import { SettingsButton, SETTINGS_TABS } from '../../settings';
 
 import { AbstractWelcomePage, _mapStateToProps } from './AbstractWelcomePage';
 import Tabs from './Tabs';
+import { saveShadeCubeAuth } from '../../shade-cube-auth';
 
+import { default as Notice } from '../../conference/components/web/Notice';
+import { shadeCubeApis } from '../../base/conference';
 /**
  * The pattern used to validate room name.
  * @type {string}
@@ -174,7 +177,7 @@ class WelcomePage extends AbstractWelcomePage {
 					<div className="header-text" />
 					<div id="enter_room">
 						<div className="enter-room-input-container">
-							<div className="enter-room-title">{t('welcomepage.enterRoomTitle')}</div>
+							<div className="enter-room-title">{ this.props._auth.user ? t('welcomepage.enterRoomTitle') : t('welcomepage.joinMeeting')}</div>
 							<form onSubmit={this._onFormSubmit}>
 								<input
 									autoFocus={true}
@@ -210,11 +213,122 @@ class WelcomePage extends AbstractWelcomePage {
      */
 	_onFormSubmit(event) {
 		event.preventDefault();
+		if(!this.state.isChecking){
+			const room = this.state.room || this.state.generatedRoomname;
+			fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`).then(res => res.json())
+			.then(res => {
+				// checking user is authanticate or not
+				if(!this.props._auth.user){
+					// if user in not authanticated and room is active
+					if(res.is_active){
+						// join room
+						this._joinJitsiRoom();
+					}else{
+						alert("not a valid room")
+					}
+				}else{
+					// if room dose exist
+					if(!res.id){
+						this._createShadeCubeRoom(room)
+						this.props.dispatch(saveShadeCubeAuth({
+							morderator: true
+						}))
+					}
+					// if room dose on exist
+					else{
+						if(res.is_active){
+							// join room
+							this._joinJitsiRoom();
+						}else if(res.auth_id === this.props._auth.user?.auth_id){
+							this._activateShadeCubeRoom(room)
+							this.props.dispatch(saveShadeCubeAuth({
+								morderator: true
+							}))
+						}else {
+							this._activateShadeCubeRoom(room)
+							this.props.dispatch(saveShadeCubeAuth({
+								morderator: true
+							}))
+						}
+					}
+				}
+			})
+			.catch(err => {
+				console.log({err})
+				alert("not a valid room")
+			})
+			
+			
+		}
+	}
 
+	/**
+	 * Join jitsi room
+	 * @private
+	 * @returns {void}
+	 */
+	_joinJitsiRoom = () => {
 		if (!this._roomInputRef || this._roomInputRef.reportValidity()) {
 			this._onJoin();
 		}
 	}
+
+	/**
+	 * create a room in shade cube 
+	 * @private
+     * @returns {void}
+	 */
+	_createShadeCubeRoom = (room) => {
+		fetch(`${shadeCubeApis.CONFERENCE_API}/`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${this.props._auth.token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				name: room,
+				"is_active": true
+			})
+		}).then(res => res.json())
+		.then(res => {
+			if(res.id){
+				// join room
+				this._joinJitsiRoom();
+			}else{
+
+			}
+		})
+		.catch(console.log)
+	}
+
+	/**
+	 * re-active a deactivated room 
+	 * @private
+     * @returns {void}
+	 */
+	_activateShadeCubeRoom = (room) => {		
+		fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
+			method: "PUT",
+			headers: {
+				Authorization: `Bearer ${this.props._auth.token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				name: room,
+				"is_active": true
+			})
+		}).then(res => res.json())
+		.then(res => {
+			if(res.is_active){
+				// join room
+				this._joinJitsiRoom();
+			}else{
+
+			}
+		})
+		.catch(console.log)
+	}
+
 
 	/**
      * Overrides the super to account for the differences in the argument types

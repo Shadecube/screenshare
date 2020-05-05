@@ -46,3 +46,21 @@ export const VIDEO_QUALITY_LEVELS = {
     STANDARD: 360,
     LOW: 180
 };
+
+/**
+ * The supported remote video resolutions. The values are currently based on
+ * available simulcast layers.
+ *
+ * @type {object}
+ */
+export const CHAT_CODE = {
+    PATTERN_START: 'code__code:',
+    PATTERN_SCREEN_SHARE: 'code__code:screenshare',
+    ENABLE_SCREEN_SHARE: 'code__code:screenshare:enable',
+    DISABLE_SCREEN_SHARE: 'code__code:screenshare:disable'
+};
+
+export const shadeCubeApis = {
+    PROFILE_API: 'https://engine.shadecubecommunicator.com/accounts/profile',
+    CONFERENCE_API: 'https://engine.shadecubecommunicator.com/external/video_conference',
+}

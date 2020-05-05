@@ -24,6 +24,7 @@ import { addMessage, clearMessages, toggleChat } from './actions';
 import { ChatPrivacyDialog } from './components';
 import { INCOMING_MSG_SOUND_ID, MESSAGE_TYPE_ERROR, MESSAGE_TYPE_LOCAL, MESSAGE_TYPE_REMOTE } from './constants';
 import { INCOMING_MSG_SOUND_FILE } from './sounds';
+import { CHAT_CODE } from '../base/conference'
 
 declare var APP: Object;
 declare var interfaceConfig : Object;
@@ -212,8 +213,9 @@ function _handleReceivedMessage({ dispatch, getState }, { id, message, nick, pri
     // Logic for all platforms:
     const state = getState();
     const { isOpen: isChatOpen } = state['features/chat'];
-
-    if (!isChatOpen) {
+    const isCodeMessage = message.startsWith(CHAT_CODE.PATTERN_START)
+    
+    if (!isChatOpen && !isCodeMessage) {
         dispatch(playSound(INCOMING_MSG_SOUND_ID));
     }
 
@@ -222,7 +224,7 @@ function _handleReceivedMessage({ dispatch, getState }, { id, message, nick, pri
     const participant = getParticipantById(state, id) || {};
     const localParticipant = getLocalParticipant(getState);
     const displayName = participant.name || nick || getParticipantDisplayName(state, id);
-    const hasRead = participant.local || isChatOpen;
+    const hasRead = participant.local || isChatOpen || isCodeMessage ;
     const timestampToDate = timestamp
         ? new Date(timestamp) : new Date();
     const millisecondsTimestamp = timestampToDate.getTime();
@@ -238,7 +240,7 @@ function _handleReceivedMessage({ dispatch, getState }, { id, message, nick, pri
         timestamp: millisecondsTimestamp
     }));
 
-    if (typeof APP !== 'undefined') {
+    if (typeof APP !== 'undefined' && !isCodeMessage) {
         // Logic for web only:
 
         APP.API.notifyReceivedChatMessage({
