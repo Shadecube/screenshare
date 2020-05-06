@@ -2689,7 +2689,7 @@ export default {
         const state = APP.store.getState()
         const participant = getLocalParticipant(state)
         if(participant){
-            if(participant?.role === PARTICIPANT_ROLE.MODERATOR){
+            if(participant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR){
                 const token = state['features/shade-cube-auth'].token
                 const room = state['features/base/conference'].room
                 

@@ -8,6 +8,8 @@ import { getLocalParticipant, PARTICIPANT_ROLE } from '../../../base/participant
 import { connect } from '../../../base/redux';
 import { AbstractButton, type AbstractButtonProps } from '../../../base/toolbox';
 import { MuteEveryoneDialog } from '../../../remote-video-menu';
+import { CHAT_CODE } from '../../../base/conference';
+import { setPrivateMessageRecipient, sendMessage } from '../../../chat';
 
 type Props = AbstractButtonProps & {
 
@@ -48,7 +50,11 @@ class MuteEveryoneButton extends AbstractButton<Props, *> {
 
         sendAnalytics(createToolbarEvent('mute.everyone.pressed'));
         dispatch(openDialog(MuteEveryoneDialog, {
-            exclude: [ localParticipantId ]
+            exclude: [ localParticipantId ],
+            callback: ()=> {
+                dispatch(setPrivateMessageRecipient())
+                dispatch(sendMessage(`${CHAT_CODE.MUTE_ALL_PARTICIPENTS_EXCEPT}--${localParticipantId}`), true)
+            }
         }));
     }
 }
@@ -62,7 +68,7 @@ class MuteEveryoneButton extends AbstractButton<Props, *> {
  */
 function _mapStateToProps(state: Object, ownProps: Props) {
     const localParticipant = getLocalParticipant(state);
-    const isModerator = localParticipant.role === PARTICIPANT_ROLE.MODERATOR;
+    const isModerator = localParticipant.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR;
     const { visible } = ownProps;
 
     return {

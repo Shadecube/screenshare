@@ -53,11 +53,27 @@ export const VIDEO_QUALITY_LEVELS = {
  *
  * @type {object}
  */
+const PATTERN_START = 'code__code:';
+const PATTERN_SCREEN_SHARE = `${PATTERN_START}screenshare:`;
+const PATTERN_AUDIO = `${PATTERN_START}audio:`;
+const PATTERN_SHADE_CUBE_ROLE = `${PATTERN_START}role:`
 export const CHAT_CODE = {
-    PATTERN_START: 'code__code:',
-    PATTERN_SCREEN_SHARE: 'code__code:screenshare',
-    ENABLE_SCREEN_SHARE: 'code__code:screenshare:enable',
-    DISABLE_SCREEN_SHARE: 'code__code:screenshare:disable'
+    PATTERN_START,
+    PATTERN_SCREEN_SHARE,
+    ENABLE_SCREEN_SHARE: `${PATTERN_SCREEN_SHARE}enable`,
+    DISABLE_SCREEN_SHARE: `${PATTERN_SCREEN_SHARE}disable`,
+
+    PATTERN_AUDIO,
+    UNMUTE_PARTICIPENT: `${PATTERN_AUDIO}unmute_participent`,
+    UNMUTE_ALL_PARTICIPENTS_EXCEPT: `${PATTERN_AUDIO}unmute_all_participents_expect`,
+    UNMUTE_ALL_PARTICIPENTS: `${PATTERN_AUDIO}unmute_all_participents`,
+    MUTE_PARTICIPENT: `${PATTERN_AUDIO}mute_participent`,
+    MUTE_ALL_PARTICIPENTS_EXCEPT: `${PATTERN_AUDIO}mute_all_participents_expect`,
+    MUTE_ALL_PARTICIPENTS: `${PATTERN_AUDIO}mute_all_participents`,
+    
+    PATTERN_SHADE_CUBE_ROLE,
+    CHANGE_SHADE_CUBE_ROLE_NONE: `${PATTERN_SHADE_CUBE_ROLE}none`,
+    CHANGE_SHADE_CUBE_ROLE_MORDERATOR: `${PATTERN_SHADE_CUBE_ROLE}morderator`,
 };
 
 export const shadeCubeApis = {

@@ -8,7 +8,7 @@ import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
 import { connect, disconnect } from '../../../base/connection';
 import { translate } from '../../../base/i18n';
 import { connect as reactReduxConnect } from '../../../base/redux';
-import { Chat } from '../../../chat';
+import { Chat, sendMessage, setPrivateMessageRecipient } from '../../../chat';
 import { Filmstrip } from '../../../filmstrip';
 import { CalleeInfoContainer } from '../../../invite';
 import { LargeVideo } from '../../../large-video';
@@ -32,8 +32,10 @@ import {
 } from '../AbstractConference';
 import type { AbstractProps } from '../AbstractConference';
 import { PARTICIPANT_ROLE, participantUpdated, getParticipants, getLocalParticipant } from '../../../base/participants';
-import { shadeCubeApis } from '../../../base/conference';
+import { shadeCubeApis, CHAT_CODE } from '../../../base/conference';
 import { maybeRedirectToWelcomePage } from '../../../app';
+import { setShadeCubeRoom } from '../../../shade-cube-room';
+import { saveShadeCubeAuth } from '../../../shade-cube-auth';
 
 declare var APP: Object;
 declare var config: Object;
@@ -124,7 +126,7 @@ class Conference extends AbstractConference<Props, *> {
      */
     componentDidMount() {
         document.title = interfaceConfig.APP_NAME;
-        
+        this._updateShadeCubeMorderator()
         this._checkShadeCubeRoomStatus(this._start());
     }
 
@@ -133,6 +135,7 @@ class Conference extends AbstractConference<Props, *> {
         fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`).then(res => res.json())
         .then(res => {
             if(res.is_active){
+                this.props.dispatch(setShadeCubeRoom(res));
                 if(typeof cb === "function"){
                     cb();
                 }
@@ -154,6 +157,19 @@ class Conference extends AbstractConference<Props, *> {
      * returns {void}
      */
     componentDidUpdate(prevProps) {
+
+        if(this.props._shadeCubeRoom !== prevProps._shadeCubeRoom && this.props._shadeCubeRoom.room?.auth_id){
+            this._updateShadeCubeMorderator(true)
+        }
+        if(this.props._participant.id !== prevProps._participant.id ||
+            this.props._participant.connectionStatus !== prevProps._participant.connectionStatus 
+        ){
+            setTimeout(() => {
+                this._updateShadeCubeMorderator(true)
+            }, 2000);
+        }
+        // this._updateShadeCubeMorderator()
+        this._updateRestUserRoles(prevProps)
         if (this.props._shouldDisplayTileView
             === prevProps._shouldDisplayTileView) {
             return;
@@ -164,9 +180,9 @@ class Conference extends AbstractConference<Props, *> {
         // are in react they should calculate size on their own as much as
         // possible and pass down sizings.
         VideoLayout.refreshLayout();
-        if(this.props._auth.checkFlag !== prevProps._auth.checkFlag){
-            this._checkShadeCubeRoomStatus()
-        }
+        // if(this.props._auth.checkFlag !== prevProps._auth.checkFlag){
+        //     this._checkShadeCubeRoomStatus()
+        // }
     }
 
     /**
@@ -182,6 +198,114 @@ class Conference extends AbstractConference<Props, *> {
             document.removeEventListener(name, this._onFullScreenChange));
 
         APP.conference.isJoined() && this.props.dispatch(disconnect());
+    }
+
+    /**
+     * update shadecube user as morderator if user auth match with room
+     * 
+     * @private
+     * @returns {void}
+     */
+
+    _updateShadeCubeMorderator = (force = false) => {
+        const {
+            _messages,
+            _participant,
+            _auth,
+            _shadeCubeRoom
+        } = this.props
+        const filterdMessages = _messages.filter( m => m.message.startsWith(CHAT_CODE.PATTERN_SHADE_CUBE_ROLE) && m.message.includes(_participant?.id))
+        .sort((a, b) => b.timestamp - a.timestamp);
+        if(filterdMessages.length === 0 || force){
+            if(_auth.user?.auth_id === _shadeCubeRoom.room?.auth_id){
+                this.props.dispatch(saveShadeCubeAuth({
+                    morderator: true
+                }))
+                if(_participant?.id){
+                    this.props.dispatch(participantUpdated({
+                        id: _participant.id,
+                        shadeCubeRole: PARTICIPANT_ROLE.MODERATOR
+                    }))
+                    setTimeout(() => {
+                        this._signalForOtherUser(_participant.id, true)
+                    }, 1000);
+                }
+            }else{
+                this.props.dispatch(saveShadeCubeAuth({
+                    morderator: false
+                }))
+                if(_participant?.id){
+                    this.props.dispatch(participantUpdated({
+                        id: _participant.id,
+                        shadeCubeRole: PARTICIPANT_ROLE.NONE
+                    }))
+                    setTimeout(() => {
+                        this._signalForOtherUser(_participant.id, false)
+                    }, 1000);
+                }
+            }
+        }
+    }
+
+    _signalForOtherUser = (id, isMorderator = false) => {
+        const {
+            _messages
+        } = this.props
+        const filterdMessages = _messages.filter( m => m.message.startsWith(CHAT_CODE.PATTERN_SHADE_CUBE_ROLE) && m.message.includes(id))
+        .sort((a, b) => b.timestamp - a.timestamp);
+        
+        const oldMsg = filterdMessages[0]?.message
+        const newMsg = `${isMorderator ? CHAT_CODE.CHANGE_SHADE_CUBE_ROLE_MORDERATOR : CHAT_CODE.CHANGE_SHADE_CUBE_ROLE_NONE}--${id}`
+        if(oldMsg !== newMsg){   
+
+            
+            this.props.dispatch(setPrivateMessageRecipient())
+            this.props.dispatch(sendMessage(newMsg, true))
+        }
+    }
+    /**
+     * update rest roles
+     * 
+     * @private
+     * @returns {void}
+     */
+    _updateRestUserRoles = (oldProps) => {
+        const {
+            _participants,
+            _messages
+        } = this.props
+        const {
+            _participants: oldParticipants
+        } = oldProps || {}
+        const {
+            CHANGE_SHADE_CUBE_ROLE_MORDERATOR,
+            CHANGE_SHADE_CUBE_ROLE_NONE,
+            PATTERN_SHADE_CUBE_ROLE
+        } = CHAT_CODE
+        const messages = _messages.filter( m => m.message.startsWith(PATTERN_SHADE_CUBE_ROLE))
+        .sort((a, b) => b.timestamp - a.timestamp);
+        _participants.forEach(p => {
+            if(!p.local){
+                const oldRole = (oldParticipants || []).find( oldP => oldP?.id === p?.id)?.shadeCubeRole
+                const filtredMessages = messages.filter(m => m.message.includes(p.id))
+                const msg = filtredMessages[0]?.message
+                if(msg){
+                    const morderatorStr = `${CHANGE_SHADE_CUBE_ROLE_MORDERATOR}--${p.id}`
+                    const noneStr = `${CHANGE_SHADE_CUBE_ROLE_NONE}--${p.id}`
+                    if(msg === morderatorStr && (!oldRole || oldRole !== PARTICIPANT_ROLE.MODERATOR)){
+                        this.props.dispatch(participantUpdated({
+                            id: p.id,
+                            shadeCubeRole: PARTICIPANT_ROLE.MODERATOR
+                        }))
+                    }else if(msg === noneStr && (!oldRole || oldRole !== PARTICIPANT_ROLE.NONE)){
+                        this.props.dispatch(participantUpdated({
+                            id: p.id,
+                            shadeCubeRole: PARTICIPANT_ROLE.NONE
+                        }))
+                    }
+                }
+            }
+        })
     }
 
     /**
@@ -291,9 +415,10 @@ function _mapStateToProps(state) {
         _iAmRecorder: state['features/base/config'].iAmRecorder,
         _layoutClassName: LAYOUT_CLASSNAMES[currentLayout],
         _auth: state['features/shade-cube-auth'],
+        _shadeCubeRoom: state['features/shade-cube-room'],
         _participants: getParticipants(state),
         _participant: getLocalParticipant(state),
-        
+        _messages: state['features/chat'].messages,
     };
 }
 

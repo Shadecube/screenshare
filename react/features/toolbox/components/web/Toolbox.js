@@ -205,7 +205,7 @@ type Props = {
      */
     _isModerator: Boolean,
 
-    
+
 };
 
 /**
@@ -706,7 +706,7 @@ class Toolbox extends Component<Props, State> {
     _onMessageRecieved() {
         const {
             _messages,
-            _participants,
+            // _participants,
             _localParticipantID
         } = this.props
         const {
@@ -714,9 +714,9 @@ class Toolbox extends Component<Props, State> {
             ENABLE_SCREEN_SHARE,
             DISABLE_SCREEN_SHARE
         } = CHAT_CODE
-        const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
+        // const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
         
-        const messages  = _messages.filter(message => message?.id === morderator?.id && message.message.startsWith(PATTERN_START) )
+        const messages  = _messages.filter(message => message.message.startsWith(PATTERN_START) )
                             .sort((a, b) => b.timestamp - a.timestamp);
 
         if(messages.length ){
@@ -1417,7 +1417,7 @@ function _mapStateToProps(state) {
     const buttons = new Set(interfaceConfig.TOOLBAR_BUTTONS);
 
     const participant = getLocalParticipant(state);
-    const _isModerator = Boolean(participant?.role === PARTICIPANT_ROLE.MODERATOR)
+    const _isModerator = Boolean(participant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)
 
     return {
         _chatOpen: state['features/chat'].isOpen,

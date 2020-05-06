@@ -194,7 +194,8 @@ function _participantJoined({ participant }) {
         name,
         pinned,
         presence,
-        role
+        role,
+        shadeCubeRole,
     } = participant;
     let { conference, id } = participant;
 
@@ -226,6 +227,7 @@ function _participantJoined({ participant }) {
         name,
         pinned: pinned || false,
         presence,
-        role: role || PARTICIPANT_ROLE.NONE
+        role: role || PARTICIPANT_ROLE.NONE,
+        shadeCubeRole: shadeCubeRole || PARTICIPANT_ROLE.NONE
     };
 }

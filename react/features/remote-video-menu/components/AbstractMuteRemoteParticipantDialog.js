@@ -55,9 +55,12 @@ export default class AbstractMuteRemoteParticipantDialog<P:Props = Props>
      * @returns {boolean} - True (to note that the modal should be closed).
      */
     _onSubmit() {
-        const { dispatch, participantID } = this.props;
+        const { dispatch, participantID, afterSubmit } = this.props;
 
         dispatch(muteRemote(participantID));
+        if(typeof afterSubmit === "function"){
+            afterSubmit()
+        }
 
         return true;
     }

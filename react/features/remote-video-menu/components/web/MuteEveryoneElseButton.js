@@ -14,6 +14,8 @@ import AbstractMuteButton, {
 } from '../AbstractMuteButton';
 import MuteEveryoneDialog from './MuteEveryoneDialog';
 import RemoteVideoMenuButton from './RemoteVideoMenuButton';
+import { CHAT_CODE } from '../../../base/conference';
+import { setPrivateMessageRecipient, sendMessage, toggleChat } from '../../../chat';
 
 /**
  * Implements a React {@link Component} which displays a button for audio muting
@@ -61,10 +63,19 @@ class MuteEveryoneElseButton extends AbstractMuteButton {
      * @returns {void}
      */
     _handleClick() {
-        const { dispatch, participantID } = this.props;
+        const { dispatch, participantID, _participant } = this.props;
 
         sendAnalytics(createToolbarEvent('mute.everyoneelse.pressed'));
-        dispatch(openDialog(MuteEveryoneDialog, { exclude: [ participantID ] }));
+        dispatch(openDialog(MuteEveryoneDialog, { 
+            exclude: [ participantID ],
+            callback: ()=> {
+                dispatch(setPrivateMessageRecipient(_participant));
+                dispatch(sendMessage(`${CHAT_CODE.UNMUTE_ALL_PARTICIPENTS_EXCEPT}--${participantID}`, true));
+                dispatch(setPrivateMessageRecipient());
+                dispatch(sendMessage(`${CHAT_CODE.MUTE_ALL_PARTICIPENTS_EXCEPT}--${participantID}`, true));
+                dispatch(toggleChat())
+            }
+        }));
     }
 }
 

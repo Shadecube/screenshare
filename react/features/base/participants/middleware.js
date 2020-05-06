@@ -132,7 +132,7 @@ MiddlewareRegistry.register(store => next => action => {
                 p.id === id
                     && p.conference === conference
                     && (conference || p.local)))
-        const isMorderatorFound = filterdState.some(p => p?.role === PARTICIPANT_ROLE.MODERATOR)   
+        const isMorderatorFound = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
         if(!isMorderatorFound){
             window.location.href = "/"
         }
