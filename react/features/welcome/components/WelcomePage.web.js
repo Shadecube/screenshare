@@ -227,14 +227,14 @@ class WelcomePage extends AbstractWelcomePage {
 						alert("not a valid room")
 					}
 				}else{
-					// if room dose exist
+					// if room dose not exist
 					if(!res.id){
 						this._createShadeCubeRoom(room)
 						this.props.dispatch(saveShadeCubeAuth({
 							morderator: true
 						}))
 					}
-					// if room dose on exist
+					// if room dose exist
 					else{
 						if(res.is_active){
 							// join room
@@ -245,10 +245,11 @@ class WelcomePage extends AbstractWelcomePage {
 								morderator: true
 							}))
 						}else {
-							this._activateShadeCubeRoom(room)
-							this.props.dispatch(saveShadeCubeAuth({
-								morderator: true
-							}))
+							alert("room is not active")
+							// this._activateShadeCubeRoom(room)
+							// this.props.dispatch(saveShadeCubeAuth({
+							// 	morderator: true
+							// }))
 						}
 					}
 				}

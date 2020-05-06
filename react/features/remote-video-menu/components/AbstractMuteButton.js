@@ -11,9 +11,13 @@ import {
     AbstractButton,
     type AbstractButtonProps
 } from '../../base/toolbox';
+import { setPrivateMessageRecipient, sendMessage, toggleChat
+} from '../../chat/actions';
 import { isRemoteTrackMuted } from '../../base/tracks';
 
 import { MuteRemoteParticipantDialog } from '.';
+import { CHAT_CODE } from '../../base/conference';
+import { getParticipantById } from '../../base/participants';
 
 export type Props = AbstractButtonProps & {
 
@@ -56,15 +60,43 @@ export default class AbstractMuteButton extends AbstractButton<Props, *> {
      * @returns {void}
      */
     _handleClick() {
-        const { dispatch, participantID } = this.props;
+        const { dispatch, participantID, _participant } = this.props;
+        const {
+            UNMUTE_PARTICIPENT,
+            MUTE_PARTICIPENT
+        } = CHAT_CODE
+        if(this._isDisabled()){
+            
+            dispatch(setPrivateMessageRecipient(_participant))
+            dispatch(sendMessage(`${UNMUTE_PARTICIPENT}--${participantID}`), true)
+            dispatch(setPrivateMessageRecipient())
+            dispatch(toggleChat())
 
-        sendAnalytics(createRemoteVideoMenuButtonEvent(
-            'mute.button',
-            {
-                'participant_id': participantID
+        }else{
+            sendAnalytics(createRemoteVideoMenuButtonEvent(
+                'mute.button',
+                {
+                    'participant_id': participantID
+                }));
+    
+            dispatch(openDialog(MuteRemoteParticipantDialog, { 
+                participantID,
+                afterSubmit : ()=>{
+                    dispatch(setPrivateMessageRecipient(_participant))
+                    dispatch(sendMessage(`${MUTE_PARTICIPENT}--${participantID}`), true)
+                    dispatch(setPrivateMessageRecipient())
+                    dispatch(toggleChat())
+                }
             }));
+        }
 
-        dispatch(openDialog(MuteRemoteParticipantDialog, { participantID }));
+        // sendAnalytics(createRemoteVideoMenuButtonEvent(
+        //     'mute.button',
+        //     {
+        //         'participant_id': participantID
+        //     }));
+
+        // dispatch(openDialog(MuteRemoteParticipantDialog, { participantID }));
     }
 
     /**
@@ -100,6 +132,7 @@ export function _mapStateToProps(state: Object, ownProps: Props) {
     const tracks = state['features/base/tracks'];
 
     return {
+        _participant: getParticipantById(state, ownProps.participantID),
         _audioTrackMuted: isRemoteTrackMuted(
             tracks, MEDIA_TYPE.AUDIO, ownProps.participantID)
     };

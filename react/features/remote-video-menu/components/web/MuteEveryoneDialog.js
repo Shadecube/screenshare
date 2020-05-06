@@ -85,10 +85,14 @@ class MuteEveryoneDialog extends AbstractMuteRemoteParticipantDialog<Props> {
     _onSubmit() {
         const {
             dispatch,
-            exclude
+            exclude,
+            callback
         } = this.props;
 
         dispatch(muteAllParticipants(exclude));
+        if(typeof callback === "function"){
+            callback()
+        }
 
         return true;
     }
@@ -111,10 +115,10 @@ class MuteEveryoneDialog extends AbstractMuteRemoteParticipantDialog<Props> {
             .join(', ');
 
         return whom.length ? {
-            content: t('dialog.muteEveryoneElseDialog'),
+            // content: t('dialog.muteEveryoneElseDialog'),
             title: t('dialog.muteEveryoneElseTitle', { whom })
         } : {
-            content: t('dialog.muteEveryoneDialog'),
+            // content: t('dialog.muteEveryoneDialog'),
             title: t('dialog.muteEveryoneTitle')
         };
     }

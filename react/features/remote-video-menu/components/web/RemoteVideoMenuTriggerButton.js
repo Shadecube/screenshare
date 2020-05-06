@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 
 import { Icon, IconMenuThumb } from '../../../base/icons';
-import { getLocalParticipant, PARTICIPANT_ROLE } from '../../../base/participants';
+import { getLocalParticipant, PARTICIPANT_ROLE, getParticipantById } from '../../../base/participants';
 import { Popover } from '../../../base/popover';
 import { connect } from '../../../base/redux';
 
@@ -164,18 +164,21 @@ class RemoteVideoMenuTriggerButton extends Component<Props> {
             onRemoteControlToggle,
             onVolumeChange,
             remoteControlState,
-            participantID
+            participantID,
+            _isShadeCubeMorderator,
+            _isRemoteShadeCubeMorderator
         } = this.props;
 
         const buttons = [];
-
-        if (_isModerator) {
-            buttons.push(
-                <AllowScreenShareButton
-                    isAudioMuted = { isAudioMuted }
-                    key = 'allow-screen'
-                    participantID = { participantID } />
-            );
+        if(_isShadeCubeMorderator) {
+            if(!_isRemoteShadeCubeMorderator){
+                buttons.push(
+                    <AllowScreenShareButton
+                        isAudioMuted = { isAudioMuted }
+                        key = 'allow-screen'
+                        participantID = { participantID } />
+                );
+            }
             buttons.push(
                 <MuteButton
                     isAudioMuted = { isAudioMuted }
@@ -187,6 +190,9 @@ class RemoteVideoMenuTriggerButton extends Component<Props> {
                     key = 'mute-others'
                     participantID = { participantID } />
             );
+        }
+        if (_isModerator) {
+            
             buttons.push(
                 <KickButton
                     key = 'kick'
@@ -239,12 +245,16 @@ class RemoteVideoMenuTriggerButton extends Component<Props> {
  * @private
  * @returns {{
  *     _isModerator: boolean
+ *     _isShadeCubeMorderator: boolean
+ *     _isRemoteShadeCubeMorderator: boolean
  * }}
  */
-function _mapStateToProps(state) {
+function _mapStateToProps(state, ownProps) {
     const participant = getLocalParticipant(state);
-
+    const remotePaticipant = getParticipantById(ownProps.participantID)
     return {
+        _isShadeCubeMorderator: Boolean(participant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR),
+        _isRemoteShadeCubeMorderator:  Boolean(remotePaticipant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR),
         _isModerator: Boolean(participant?.role === PARTICIPANT_ROLE.MODERATOR)
     };
 }

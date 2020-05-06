@@ -84,16 +84,16 @@ class AllowScreenShareButton extends AbstractButton<Props, any> {
         const { 
             _participant,
             _messages,
-            _participants
+            // _participants
         } = props;
         const participantId = participantID || _participant.id
         const {
-            PATTERN_START,
+            PATTERN_SCREEN_SHARE,
             ENABLE_SCREEN_SHARE,
             DISABLE_SCREEN_SHARE
         } = CHAT_CODE
-        const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
-        const messages  = _messages.filter(message => message?.id === morderator?.id  && message.message.startsWith(PATTERN_START) )
+        // const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
+        const messages  = _messages.filter(message => message.message.startsWith(PATTERN_SCREEN_SHARE) )
                             .sort((a, b) => b.timestamp - a.timestamp);
 
         

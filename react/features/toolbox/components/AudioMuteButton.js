@@ -13,6 +13,8 @@ import { AbstractAudioMuteButton } from '../../base/toolbox';
 import type { AbstractButtonProps } from '../../base/toolbox';
 import { isLocalTrackMuted } from '../../base/tracks';
 import { muteLocal } from '../../remote-video-menu/actions';
+import { CHAT_CODE } from '../../base/conference';
+import { getParticipants, getLocalParticipant, PARTICIPANT_ROLE } from '../../base/participants';
 
 declare var APP: Object;
 
@@ -58,6 +60,10 @@ class AudioMuteButton extends AbstractAudioMuteButton<Props, *> {
 
         // Bind event handlers so they are only bound once per instance.
         this._onKeyboardShortcut = this._onKeyboardShortcut.bind(this);
+        this.state = {
+            isToggled: false,
+            isDisabledByMorderator: false
+        }
     }
 
     /**
@@ -96,7 +102,100 @@ class AudioMuteButton extends AbstractAudioMuteButton<Props, *> {
     _isAudioMuted() {
         return this.props._audioMuted;
     }
+    _handleClick(){
+        super._handleClick()
+        // if(this.state.isDisabledByMorderator && this.props._participant.shadeCubeRole !== PARTICIPANT_ROLE.MODERATOR){
+        //     if(!this._isAudioMuted()){
+        //         super._handleClick()
+        //     }
+        // }else{
+        //     super._handleClick()
+        // }
+    }
+    componentDidUpdate(prevProps){
+        if(this.props._messages !== prevProps._messages){
+            this._onMessageRecieve()
+        }
+    }
 
+    /**
+     * On signal of morderator, and toggles the audio mute state
+     * accordingly.
+     *
+     * @private
+     * @returns {void}
+     */
+    _onMessageRecieve = () =>{
+        const {
+            _messages,
+            // _participants,
+            _participant
+        } = this.props
+        const {
+            PATTERN_AUDIO,
+            UNMUTE_PARTICIPENT,
+            UNMUTE_ALL_PARTICIPENTS,
+            UNMUTE_ALL_PARTICIPENTS_EXCEPT,
+            
+            MUTE_PARTICIPENT,
+            MUTE_ALL_PARTICIPENTS,
+            MUTE_ALL_PARTICIPENTS_EXCEPT,
+            
+        } = CHAT_CODE
+        // const morderator = _participants.find(participant => (participant?.role === PARTICIPANT_ROLE.MODERATOR))
+        const messages = _messages.filter(message => message.message.startsWith(PATTERN_AUDIO) )
+        .sort((a, b) => b.timestamp - a.timestamp);
+
+        if(messages.length){
+            const message = messages[0].message
+            if(message === `${MUTE_PARTICIPENT}--${_participant.id}`
+            || message === `${MUTE_ALL_PARTICIPENTS}`){
+                this.setState({
+                    isDisabledByMorderator: true,
+                }, ()=> {
+                    if(!this._isAudioMuted()){
+                        this._handleClick();
+                    }
+                })
+            }else if(message.startsWith(MUTE_ALL_PARTICIPENTS_EXCEPT)){
+                if(message !== `${MUTE_ALL_PARTICIPENTS_EXCEPT}--${_participant.id}`){
+                    this.setState({
+                        isDisabledByMorderator: true,
+                    }, ()=> {
+                        if(!this._isAudioMuted()){
+                            this._handleClick();
+                        }
+                    })
+                }
+            }
+            if(this._isAudioMuted()){
+                if(message === `${UNMUTE_PARTICIPENT}--${_participant.id}`
+                    || message === `${UNMUTE_ALL_PARTICIPENTS}`
+                ){
+                    this.setState({
+                        isDisabledByMorderator: false
+                    }, ()=> {
+                        this._handleClick();
+                    })
+                }else if(message.startsWith(UNMUTE_ALL_PARTICIPENTS_EXCEPT) ){
+                    if(message !== `${MUTE_ALL_PARTICIPENTS_EXCEPT}--${_participant.id}`){
+                        this.setState({
+                            isDisabledByMorderator: false
+                        }, ()=> {
+                            this._handleClick();
+                        })
+                    }
+                }
+            }
+                // const lastParticipantId = messages[0].message.replace(`${ENABLE_SCREEN_SHARE}--`, "")
+                // const lastParticipant = _participants.find(participant => participant.id === lastParticipantId)
+
+                // if(lastParticipant && lastParticipantId !== _participant.id){
+                //     _setPrivateMessageRecipient(lastParticipant);
+                //     _sendMessage(`${DISABLE_SCREEN_SHARE}--${lastParticipantId}`, true);
+                // }
+        }
+    }
     _onKeyboardShortcut: () => void;
 
     /**
@@ -113,7 +212,7 @@ class AudioMuteButton extends AbstractAudioMuteButton<Props, *> {
                 ACTION_SHORTCUT_TRIGGERED,
                 { enable: !this._isAudioMuted() }));
 
-        super._handleClick();
+        this._handleClick();
     }
 
     /**
@@ -147,12 +246,16 @@ class AudioMuteButton extends AbstractAudioMuteButton<Props, *> {
  *     _audioMuted: boolean
  * }}
  */
+
 function _mapStateToProps(state): Object {
     const tracks = state['features/base/tracks'];
 
     return {
         _audioMuted: isLocalTrackMuted(tracks, MEDIA_TYPE.AUDIO),
-        _disabled: state['features/base/config'].startSilent
+        _disabled: state['features/base/config'].startSilent,
+        _messages: state['features/chat'].messages,
+        _participants: getParticipants(state),
+        _participant: getLocalParticipant(state)
     };
 }
 
