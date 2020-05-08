@@ -174,7 +174,15 @@ class WelcomePage extends AbstractWelcomePage {
 						) : null}
 					</div>
 					<div className="header-image" />
-					<div className="header-text" />
+					<div className = 'header-text'>
+							<h1 className = 'header-text-title'>
+									{ t('welcomepage.title') }
+							</h1>
+							<p className = 'header-text-description'>
+									{ t('welcomepage.appDescription',
+											{ app: APP_NAME }) }
+							</p>
+					</div>
 					<div id="enter_room">
 						<div className="enter-room-input-container">
 							<div className="enter-room-title">{ this.props._auth.user ? t('welcomepage.enterRoomTitle') : t('welcomepage.joinMeeting')}</div>
