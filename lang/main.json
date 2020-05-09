@@ -747,7 +747,7 @@
 			"join": "Tap to join",
 			"roomname": "Enter room name"
 		},
-		"appDescription": "Go ahead, video chat with your entire team, students, business partners of family members.  In fact, invite everyone you know.  Shadecube's video conferencing system is a fully encrypted powerhouse that you can use all day, every day.",
+		"appDescription": "Video conference with your team, your students, co-workers, teachers, friends and family members. Enjoy the ShadeCube experience. Start your meeting by creating a video conferencing room and click 'go'",
 		"audioVideoSwitch": {
 			"audio": "Voice",
 			"video": "Video"
@@ -771,6 +771,6 @@
 		"roomnameHint": "Enter the name or URL of the room you want to join. You may make a name up, just let the people you are meeting know it so that they enter the same name.",
 		"sendFeedback": "Send feedback",
 		"terms": "Terms",
-		"title": "Welcome to Shadecube's Secure, Massively Featured, Amazing Video Conferencing Engine"
+		"title": "Secure, Comprehensive, Multi Featured Video Conferencing Platform."
 	}
 }

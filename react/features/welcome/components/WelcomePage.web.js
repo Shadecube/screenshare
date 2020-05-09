@@ -174,10 +174,11 @@ class WelcomePage extends AbstractWelcomePage {
 						) : null}
 					</div>
 					<div className="header-image" />
-					<div className = 'header-text'>
-							<h1 className = 'header-text-title'>
+					<div className='header-text'>
+							<h1 className = 'header-text-title'>Welcome to ShadeCube</h1>
+							<h4>
 									{ t('welcomepage.title') }
-							</h1>
+							</h4>
 							<p className = 'header-text-description'>
 									{ t('welcomepage.appDescription',
 											{ app: APP_NAME }) }
