@@ -48,15 +48,16 @@ export const VIDEO_QUALITY_LEVELS = {
 };
 
 /**
- * The supported remote video resolutions. The values are currently based on
- * available simulcast layers.
+ * Chat codes using for internal signals to trigger custom events.
  *
  * @type {object}
  */
 const PATTERN_START = 'code__code:';
 const PATTERN_SCREEN_SHARE = `${PATTERN_START}screenshare:`;
 const PATTERN_AUDIO = `${PATTERN_START}audio:`;
-const PATTERN_SHADE_CUBE_ROLE = `${PATTERN_START}role:`
+const PATTERN_SHADE_CUBE_ROLE = `${PATTERN_START}role:`;
+const PATTERN_ROOM = `${PATTERN_START}room:`;
+
 export const CHAT_CODE = {
     PATTERN_START,
     PATTERN_SCREEN_SHARE,
@@ -74,6 +75,8 @@ export const CHAT_CODE = {
     PATTERN_SHADE_CUBE_ROLE,
     CHANGE_SHADE_CUBE_ROLE_NONE: `${PATTERN_SHADE_CUBE_ROLE}none`,
     CHANGE_SHADE_CUBE_ROLE_MORDERATOR: `${PATTERN_SHADE_CUBE_ROLE}morderator`,
+
+    EVERYONE_OUT_FROM_ROOM: `${PATTERN_ROOM}out_everyone`
 };
 
 export const shadeCubeApis = {
