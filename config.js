@@ -5,35 +5,35 @@ var config = {
 
 	hosts: {
 		// XMPP domain.
-		domain: 'conference.shadecube.com',
+		domain: 'meeting.shadecube.com',
 
 		// When using authentication, domain for guest users.
 		// anonymousdomain: 'guest.example.com',
 
 		// Domain for authenticated users. Defaults to <domain>.
-		// authdomain: 'conference.shadecube.com',
+		// authdomain: 'meeting.shadecube.com',
 
 		// Jirecon recording component domain.
-		// jirecon: 'jirecon.conference.shadecube.com',
+		// jirecon: 'jirecon.meeting.shadecube.com',
 
 		// Call control component (Jigasi).
-		// call_control: 'callcontrol.conference.shadecube.com',
+		// call_control: 'callcontrol.meeting.shadecube.com',
 
 		// Focus component domain. Defaults to focus.<domain>.
-		// focus: 'focus.conference.shadecube.com',
+		// focus: 'focus.meeting.shadecube.com',
 
 		// XMPP MUC domain. FIXME: use XEP-0030 to discover it.
-		muc: 'conference.conference.shadecube.com'
+		muc: 'conference.meeting.shadecube.com'
 	},
 
 	// BOSH URL. FIXME: use XEP-0156 to discover it.
-	bosh: '//conference.shadecube.com/http-bind',
+	bosh: '//meeting.shadecube.com/http-bind',
 
 	// The name of client node advertised in XEP-0115 'c' stanza
 	clientNode: 'http://jitsi.org/jitsimeet',
 
 	// The real JID of focus participant - can be overridden here
-	// focusUserJid: 'focus@auth.conference.shadecube.com',
+	// focusUserJid: 'focus@auth.meeting.shadecube.com',
 
 	// Testing / experimental features.
 	//
@@ -75,11 +75,11 @@ var config = {
 	// startAudioOnly: false,
 
 	// Every participant after the Nth will start audio muted.
-	// startAudioMuted: 10,
+	startAudioMuted: 5,
 
 	// Start calls with audio muted. Unlike the option above, this one is only
 	// applied locally. FIXME: having these 2 options is confusing.
-	// startWithAudioMuted: false,
+	// startWithAudioMuted: true,
 
 	// Enabling it (with #params) will disable local audio output of remote
 	// participants and to enable it back a reload is needed.
@@ -115,11 +115,11 @@ var config = {
 	// enableLayerSuspension: false,
 
 	// Every participant after the Nth will start video muted.
-	// startVideoMuted: 10,
+	startVideoMuted: 5,
 
 	// Start calls with video muted. Unlike the option above, this one is only
 	// applied locally. FIXME: having these 2 options is confusing.
-	// startWithVideoMuted: false,
+	// startWithVideoMuted: true,
 
 	// If set to true, prefer to use the H.264 video codec (if supported).
 	// Note that it's not recommended to do this because simulcast is not
