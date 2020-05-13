@@ -9,7 +9,8 @@ import { APP_WILL_MOUNT, APP_WILL_UNMOUNT } from '../app';
 import {
     CONFERENCE_WILL_JOIN,
     forEachConference,
-    getCurrentConference
+    getCurrentConference,
+    shadeCubeApis
 } from '../conference';
 import { JitsiConferenceEvents } from '../lib-jitsi-meet';
 import { MiddlewareRegistry, StateListenerRegistry } from '../redux';
@@ -134,7 +135,33 @@ MiddlewareRegistry.register(store => next => action => {
                     && (conference || p.local)))
         const isMorderatorFound = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
         if(!isMorderatorFound){
-            window.location.href = "/"
+            // window.location.href = "/"
+            setTimeout(() => {
+                const filterdState = getParticipants(store.getState()).filter(p =>
+                    !( p.id === id
+                        && p.conference === conference
+                        && (conference || p.local)))
+                const nextCheck = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
+                if(!nextCheck){
+                    const room  = store.getState()['features/base/conference'].room;
+                    fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
+                        method: "PUT",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: room,
+                            "is_active": false
+                        })
+                    }).then(res => res.json())
+                    .then(() => {
+                        window.location.href = "/"
+                    })
+                    .catch(()=> {
+                        window.location.href = "/"
+                    })
+                }
+            }, 60 * 1000);
         }
         _maybePlaySounds(store, action);
         break;

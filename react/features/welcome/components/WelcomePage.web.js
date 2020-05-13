@@ -177,7 +177,7 @@ class WelcomePage extends AbstractWelcomePage {
 					<div className="header-text" />
 					<div id="enter_room">
 						<div className="enter-room-input-container">
-							<div className="enter-room-title">{ this.props._auth.user ? t('welcomepage.enterRoomTitle') : t('welcomepage.joinMeeting')}</div>
+							<div className="enter-room-title">{ this.state.isVerifiedToken ? t('welcomepage.enterRoomTitle') : t('welcomepage.joinMeeting')}</div>
 							<form onSubmit={this._onFormSubmit}>
 								<input
 									autoFocus={true}
@@ -218,7 +218,7 @@ class WelcomePage extends AbstractWelcomePage {
 			fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`).then(res => res.json())
 			.then(res => {
 				// checking user is authanticate or not
-				if(!this.props._auth.user){
+				if(!this.state.isVerifiedToken){
 					// if user in not authanticated and room is active
 					if(res.is_active){
 						// join room
@@ -311,7 +311,7 @@ class WelcomePage extends AbstractWelcomePage {
 		fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
 			method: "PUT",
 			headers: {
-				Authorization: `Bearer ${this.props._auth.token}`,
+				// Authorization: `Bearer ${this.state.urlToken}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({

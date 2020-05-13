@@ -3,7 +3,7 @@
 import { createToolbarEvent, sendAnalytics } from '../../../analytics';
 import { openDialog } from '../../../base/dialog';
 import { translate } from '../../../base/i18n';
-import { IconMicDisabled } from '../../../base/icons';
+import { IconMicrophone, IconMicDisabled } from '../../../base/icons';
 import { getLocalParticipant, PARTICIPANT_ROLE } from '../../../base/participants';
 import { connect } from '../../../base/redux';
 import { AbstractButton, type AbstractButtonProps } from '../../../base/toolbox';
@@ -36,9 +36,41 @@ type Props = AbstractButtonProps & {
 class MuteEveryoneButton extends AbstractButton<Props, *> {
     accessibilityLabel = 'toolbar.accessibilityLabel.muteEveryone';
     icon = IconMicDisabled;
+    toggledIcon = IconMicrophone
     label = 'toolbar.muteEveryone';
-    tooltip = 'toolbar.muteEveryone';
+    label = 'toolbar.muteEveryone';
+    toggledLabel = 'toolbar.unmuteEveryone';
 
+    _updateLables = () => {
+        this.accessibilityLabel = this._isMutedAll() ? 'toolbar.accessibilityLabel.unmuteEveryone' : 'toolbar.accessibilityLabel.muteEveryone';
+        this.label = this._isMutedAll() ? 'toolbar.unmuteEveryone' : 'toolbar.muteEveryone';
+        this.tooltip = this._isMutedAll() ? 'toolbar.unmuteEveryone' : 'toolbar.muteEveryone';
+    }
+    /**
+     * return the mute everyone status from the messages.
+     *
+     * @private
+     * @returns {boolean}
+     */
+    _isMutedAll = () =>{
+        const {
+            MUTE_ALL_PARTICIPENTS_EXCEPT,
+            UNMUTE_ALL_PARTICIPENTS_EXCEPT
+        } = CHAT_CODE
+        const {
+            _messages,
+            localParticipantId
+        } = this.props
+        const messages = (_messages || []).filter( ({message}) => (message.includes(MUTE_ALL_PARTICIPENTS_EXCEPT) || message.includes(UNMUTE_ALL_PARTICIPENTS_EXCEPT)) && message.includes(localParticipantId) )
+        .sort((a, b) => b.timestamp - a.timestamp);
+        if(messages[0]?.message && messages[0]?.message === `${MUTE_ALL_PARTICIPENTS_EXCEPT}--${localParticipantId}` ){
+            return true
+        }
+        return false
+    }
+    _isToggled(){
+        return this._isMutedAll()
+    }
     /**
      * Handles clicking / pressing the button, and opens a confirmation dialog.
      *
@@ -47,15 +79,22 @@ class MuteEveryoneButton extends AbstractButton<Props, *> {
      */
     _handleClick() {
         const { dispatch, localParticipantId } = this.props;
-
-        sendAnalytics(createToolbarEvent('mute.everyone.pressed'));
-        dispatch(openDialog(MuteEveryoneDialog, {
-            exclude: [ localParticipantId ],
-            callback: ()=> {
-                dispatch(setPrivateMessageRecipient())
-                dispatch(sendMessage(`${CHAT_CODE.MUTE_ALL_PARTICIPENTS_EXCEPT}--${localParticipantId}`), true)
-            }
-        }));
+        if(this._isMutedAll()){
+            dispatch(setPrivateMessageRecipient())
+            dispatch(sendMessage(`${CHAT_CODE.UNMUTE_ALL_PARTICIPENTS_EXCEPT}--${localParticipantId}`), true)
+        }else{
+            sendAnalytics(createToolbarEvent('mute.everyone.pressed'));
+            dispatch(openDialog(MuteEveryoneDialog, {
+                exclude: [ localParticipantId ],
+                callback: ()=> {
+                    dispatch(setPrivateMessageRecipient())
+                    dispatch(sendMessage(`${CHAT_CODE.MUTE_ALL_PARTICIPENTS_EXCEPT}--${localParticipantId}`), true)
+                }
+            }));
+        }
+        setTimeout(() => {
+            this._updateLables()
+        }, 1000);
     }
 }
 
@@ -74,7 +113,8 @@ function _mapStateToProps(state: Object, ownProps: Props) {
     return {
         isModerator,
         localParticipantId: localParticipant.id,
-        visible: visible && isModerator
+        visible: visible && isModerator,
+        _messages: state['features/chat'].messages
     };
 }
 

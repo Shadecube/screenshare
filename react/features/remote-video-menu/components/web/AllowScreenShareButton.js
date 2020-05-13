@@ -142,15 +142,15 @@ class AllowScreenShareButton extends AbstractButton<Props, any> {
                 const lastParticipant = _participants.find(participant => participant.id === lastParticipantId)
 
                 if(lastParticipant && lastParticipantId !== _participant.id){
-                    _setPrivateMessageRecipient(lastParticipant);
+                    _setPrivateMessageRecipient();
                     _sendMessage(`${DISABLE_SCREEN_SHARE}--${lastParticipantId}`, true);
                 }
             }
         }
-        _setPrivateMessageRecipient(_participant);
-        _sendMessage(`${flag ? ENABLE_SCREEN_SHARE : DISABLE_SCREEN_SHARE}--${_participant.id}`, true);
         _setPrivateMessageRecipient();
-        _toggleChat()
+        _sendMessage(`${flag ? ENABLE_SCREEN_SHARE : DISABLE_SCREEN_SHARE}--${_participant.id}`, true);
+        // _setPrivateMessageRecipient();
+        // _toggleChat()
     }
     /**
      * Helper function to be implemented by subclasses, which must return a

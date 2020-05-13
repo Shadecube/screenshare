@@ -103,14 +103,13 @@ class AudioMuteButton extends AbstractAudioMuteButton<Props, *> {
         return this.props._audioMuted;
     }
     _handleClick(){
-        super._handleClick()
-        // if(this.state.isDisabledByMorderator && this.props._participant.shadeCubeRole !== PARTICIPANT_ROLE.MODERATOR){
-        //     if(!this._isAudioMuted()){
-        //         super._handleClick()
-        //     }
-        // }else{
-        //     super._handleClick()
-        // }
+        if(this.state.isDisabledByMorderator && this.props._participant.shadeCubeRole !== PARTICIPANT_ROLE.MODERATOR){
+            if(!this._isAudioMuted()){
+                super._handleClick()
+            }
+        }else{
+            super._handleClick()
+        }
     }
     componentDidUpdate(prevProps){
         if(this.props._messages !== prevProps._messages){
