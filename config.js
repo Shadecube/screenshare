@@ -194,7 +194,7 @@ var config = {
 	// Misc
 
 	// Default value for the channel "last N" attribute. -1 for unlimited.
-	channelLastN: 8,
+	channelLastN: 5,
 
 	// Disables or enables RTX (RFC 4588) (defaults to false).
 	// disableRtx: false,
