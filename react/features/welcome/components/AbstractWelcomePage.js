@@ -76,6 +76,8 @@ export class AbstractWelcomePage extends Component<Props, *> {
         roomPlaceholder: '',
         updateTimeoutId: undefined,
         isChecking: false,
+        urlToken: undefined,
+        isVerifiedToken: false,
     };
 
     /**
@@ -160,10 +162,12 @@ export class AbstractWelcomePage extends Component<Props, *> {
 
     _saveShadeCubeAuth(){
 		const params = (new URL(document.location)).searchParams;
-		const token = params.get('token') || this.props._auth.token;
+        const urlToken = params.get('token')
+        const token = urlToken || this.props._auth.token;
         if(token){
             this.setState({
-                isChecking: true
+                isChecking: true,
+                urlToken,
             })
 			fetch(shadeCubeApis.PROFILE_API, {
                 signal: this.abortController.signal,
@@ -176,6 +180,9 @@ export class AbstractWelcomePage extends Component<Props, *> {
 					isChecking: false
 				})
 				if(res.user){
+                    this.setState({
+                        isVerifiedToken: token === urlToken ? true : false
+                    })
                     this.props.dispatch(saveShadeCubeAuth({
                         token, 
                         user: res,

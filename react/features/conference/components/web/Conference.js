@@ -127,7 +127,9 @@ class Conference extends AbstractConference<Props, *> {
     componentDidMount() {
         document.title = interfaceConfig.APP_NAME;
         this._updateShadeCubeMorderator()
-        this._checkShadeCubeRoomStatus(this._start());
+        this._checkShadeCubeRoomStatus(()=>{
+            this._start()
+        });
     }
 
     _checkShadeCubeRoomStatus = (cb) => {
@@ -140,13 +142,13 @@ class Conference extends AbstractConference<Props, *> {
                     cb();
                 }
             }else{
-                // this.props.dispatch(maybeRedirectToWelcomePage())
-                window.location.href = "/"
+                this.props.dispatch(maybeRedirectToWelcomePage())
+                // window.location.href = "/"
             }
         })
         .catch(()=> {
-            // this.props.dispatch(maybeRedirectToWelcomePage())
-            window.location.href= "/"
+            this.props.dispatch(maybeRedirectToWelcomePage())
+            // window.location.href= "/"
         })
     }
     
@@ -170,6 +172,7 @@ class Conference extends AbstractConference<Props, *> {
         }
         // this._updateShadeCubeMorderator()
         this._updateRestUserRoles(prevProps)
+        this._removeFormRommOnSignal(prevProps)
         if (this.props._shouldDisplayTileView
             === prevProps._shouldDisplayTileView) {
             return;
@@ -263,6 +266,31 @@ class Conference extends AbstractConference<Props, *> {
             this.props.dispatch(sendMessage(newMsg, true))
         }
     }
+
+    /**
+     * out from room if out signal found.
+     * 
+     * @private
+     * @returns {void}
+     */
+    _removeFormRommOnSignal = (oldProps) => {
+        const {
+            _participant,
+            _messages
+        } = this.props
+        const {
+            _messages: oldMessages
+        } = oldProps || {}
+
+        if(oldMessages !== _messages){
+            const id = _participant?.id
+            const isOutSignal = _messages.some(m => m.message === CHAT_CODE.EVERYONE_OUT_FROM_ROOM && m.id !== id )
+            if(isOutSignal){
+                this.props.dispatch(maybeRedirectToWelcomePage())
+            }
+        }
+    }
+
     /**
      * update rest roles
      * 
