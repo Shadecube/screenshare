@@ -27,18 +27,7 @@ export const ROOM_NAME_VALIDATE_PATTERN_STR = '^[^?&:\u0022\u0027%#]+$';
  * @type {number}
  */
 const WINDOW_WIDTH_THRESHOLD = 425;
-const buttonsStyle = {
-	width: '680px',
-	textAlign: 'center',
-	display: "flex",
-	justifyContent: "space-around",
-	padding: "20px"
-}
-const oruButtons = {
-	fontSize: "18px",
-  width: "150px",
-  height: "50px"
-}
+
 const oruButtonsNew = {
 	fontSize: "18px",
   width: "150px",
@@ -263,10 +252,10 @@ class WelcomePage extends AbstractWelcomePage {
 							{showResponsiveText ? t('welcomepage.goSmall') : t('welcomepage.go')}
 						</div>
 					</div>
-					<div class="row" style={buttonsStyle}>
-							<button class="btn oru-login" onClick={this._oruLogin} style={oruButtons}>LOGIN</button>
-							<button class="btn oru-register" onClick={this._oruregisterRedirect} style={oruButtons}>REGISTER</button>
-							<button class="btn oru-media" onClick={this._orumediaRedirect} style={oruButtons}>ORUMEDIA</button>
+					<div class="row login-buttons-row">
+							<button class="btn login-button oru-login" onClick={this._oruLogin}>LOGIN</button>
+							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}>REGISTER</button>
+							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}>ORUMEDIA</button>
 					</div>
 				</div>
 				<div class="login-modal" style={modalStyle}>

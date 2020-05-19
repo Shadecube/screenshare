@@ -188,3 +188,39 @@ body.welcome-page {
 		height: 100%;
 	}
 }
+
+.login-button{
+	font-size: 18px;
+  width: 150px;
+  height: 50px;
+}
+.login-buttons-row{
+	width: 680px;
+	text-align: 'center';
+	display: "flex";
+	justify-content: "space-around";
+	padding: 20px;
+}
+@media screen and (max-width: 700px){
+	.login-buttons-row{
+		display: block;
+		width: 100%;
+	}
+	.login-button{
+		margin: 10px auto;
+	}
+	.watermark{
+		width: 80px;
+	}
+	.welcome .header #enter_room{
+		width: 80%;
+	}
+	.login-modal{
+		width: 75% !important;
+	}
+	.oru-login-subit,
+	.oru-login-cancel {
+		width: 110px !important;
+		height: 42px !important;
+	} 
+}
