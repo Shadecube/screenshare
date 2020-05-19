@@ -27,7 +27,61 @@ export const ROOM_NAME_VALIDATE_PATTERN_STR = '^[^?&:\u0022\u0027%#]+$';
  * @type {number}
  */
 const WINDOW_WIDTH_THRESHOLD = 425;
-
+const buttonsStyle = {
+	width: '680px',
+	textAlign: 'center',
+	display: "flex",
+	justifyContent: "space-around",
+	padding: "20px"
+}
+const oruButtons = {
+	fontSize: "18px",
+  width: "150px",
+  height: "50px"
+}
+const oruButtonsNew = {
+	fontSize: "18px",
+  width: "150px",
+	height: "50px",
+	margin: "0 auto" 
+}
+const oruButtonsCancel = {
+	fontSize: "18px",
+  width: "150px",
+	height: "50px",
+	margin: "0 auto",
+	background: "red"
+}
+const modalStyle = {
+	position: "fixed",
+	left: "50%",
+	top: "10%",
+	transform: "translateX(-50%)",
+	background: "white",
+	zIndex: 11,
+	width: "390px",
+	height: "230px",
+	padding: "30px",
+	paddingTop: "20px",
+	border: "1px solid",
+	borderRadius: "12px",
+	display: "none"
+}
+const modalInputStyle = {
+	display: "block",
+	width: "100%",
+	height: "calc(1.5em + .75rem + 2px)",
+	padding: ".375rem .75rem",
+	fontSize: "1rem",
+	lineHeight: "1.5",
+	color: "#495057",
+	backgroundColor: "#fff",
+	backgroundClip: "padding-box",
+	border: "1px solid #ced4da",
+	borderRadius: ".25rem",
+	transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
+	marginTop: "20px"
+}
 /**
  * The Web container rendering the welcome page.
  *
@@ -106,6 +160,10 @@ class WelcomePage extends AbstractWelcomePage {
 		this._setRoomInputRef = this._setRoomInputRef.bind(this);
 		this._setAdditionalToolbarContentRef = this._setAdditionalToolbarContentRef.bind(this);
 		this._onTabSelected = this._onTabSelected.bind(this);
+		this._orumediaRedirect = this._orumediaRedirect.bind(this);
+		this._oruregisterRedirect = this._oruregisterRedirect.bind(this);
+		this._oruLogin = this._oruLogin.bind(this);
+		this._oruLoginSubmit = this._oruLoginSubmit.bind(this);
 	}
 
 	/**
@@ -204,6 +262,21 @@ class WelcomePage extends AbstractWelcomePage {
 						<div className="welcome-page-button" id="enter_room_button" onClick={this._onFormSubmit}>
 							{showResponsiveText ? t('welcomepage.goSmall') : t('welcomepage.go')}
 						</div>
+					</div>
+					<div class="row" style={buttonsStyle}>
+							<button class="btn oru-login" onClick={this._oruLogin} style={oruButtons}>LOGIN</button>
+							<button class="btn oru-register" onClick={this._oruregisterRedirect} style={oruButtons}>REGISTER</button>
+							<button class="btn oru-media" onClick={this._orumediaRedirect} style={oruButtons}>ORUMEDIA</button>
+					</div>
+				</div>
+				<div class="login-modal" style={modalStyle}>
+					<h2 style={{width: '100%',textAlign : "center", margin:"10px",color: "black"}}>LOGIN</h2>
+					<input type="text" placeholder="ORU USERNAME" className="enter-room-input" style={modalInputStyle} id="oru-username"></input>
+					<span id="login-error-message" style={{color:"red",display: "none"}}>Invalid Username or Password</span>
+					<input type="password" placeholder="ORU PASSWORD" className="enter-room-input" style={modalInputStyle} id="oru-password"></input>
+					<div style={{ textAlign:"center", width:"100%", display: "flex", marginTop : '20px'}}>
+						<button class="btn oru-login-subit" onClick={this._oruLoginSubmit} style={oruButtonsNew}>LOGIN</button>
+						<button class="btn oru-login-cancel" onClick={this._oruLoginCancel} style={oruButtonsCancel}>CLOSE</button>
 					</div>
 				</div>
 				{showAdditionalContent ? (
@@ -477,6 +550,68 @@ class WelcomePage extends AbstractWelcomePage {
 		const { innerWidth } = window;
 
 		return innerWidth <= WINDOW_WIDTH_THRESHOLD;
+	}
+
+	_orumediaRedirect() {
+		window.location.href = 'https://orumedia.com/';
+	}
+
+	_oruregisterRedirect() {
+		window.location.href = 'https://www.orumarketplace.com/register.php';
+	}
+
+	_oruLogin() {
+		document.getElementsByClassName('login-modal')[0].style.display = 'block';
+	}
+
+	async _oruMarketLogin() {
+		let uname = document.getElementById('oru-username').value;
+		let pass = document.getElementById('oru-password').value;
+		let formData = new FormData();
+		formData.append('action','mdLn');
+		formData.append('nl',uname);
+		formData.append('dp',pass);
+		let response = await fetch(`https://www.orumarketplace.com/orutv.php`, {
+			method: 'POST',
+			mode: 'cors',
+			cache: 'no-cache',
+			body: formData
+		});
+		return response.json();
+	}
+
+	async _getChatToken(uname,pass) {
+		let response = await fetch(`https://engine.shadecubecommunicator.com/accounts/login/`, {
+			method: 'POST',
+			mode: 'cors',
+			cache: 'no-cache',
+			headers:{
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username:uname,
+				password:pass,
+				company_id:1
+			})
+		});
+		return response.json();
+	}
+
+	_oruLoginSubmit() {
+		this._oruMarketLogin().then((res) => {
+			if (!res.status) {
+				document.getElementById('login-error-message').style.display = 'block';
+			} else {
+				document.getElementById('login-error-message').style.display = 'none';
+				this._getChatToken(res.data.ec, res.data.pc).then((res) => {
+					window.location.href = '/?token=' + res.access;
+				})
+			}
+		});
+	}
+
+	_oruLoginCancel() {
+		document.getElementsByClassName('login-modal')[0].style.display = 'none';
 	}
 }
 
