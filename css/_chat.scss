@@ -15,6 +15,7 @@
     top: 0;
     transition: left 0.5s;
     width: $sidebarWidth;
+    max-width: 100%;
     z-index: $sideToolbarContainerZ;
 
     /**

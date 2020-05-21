@@ -1284,7 +1284,7 @@ class Toolbox extends Component<Props, State> {
 
         return (
             <div className = 'toolbox-content'>
-                <div className = 'button-group-left'>
+                {/* <div className = 'button-group-left'>
                     { buttonsLeft.indexOf('desktop') !== -1
                         && (this.props._isModerator || this.state.screenShareEnabled ) &&
                         this._renderDesktopSharingButton() }
@@ -1309,7 +1309,7 @@ class Toolbox extends Component<Props, State> {
                         buttonsLeft.indexOf('closedcaptions') !== -1
                             && <ClosedCaptionButton />
                     }
-                </div>
+                </div> */}
                 <div className = 'button-group-center'>
                     <AudioMuteButton
                         visible = { this._shouldShowButton('microphone') } />
@@ -1318,7 +1318,7 @@ class Toolbox extends Component<Props, State> {
                     <VideoMuteButton
                         visible = { this._shouldShowButton('camera') } />
                 </div>
-                <div className = 'button-group-right'>
+                {/* <div className = 'button-group-right'>
                     { buttonsRight.indexOf('localrecording') !== -1
                         && <LocalRecordingButton
                             onClick = {
@@ -1348,7 +1348,7 @@ class Toolbox extends Component<Props, State> {
                                 { overflowMenuContent }
                             </ul>
                         </OverflowMenuButton> }
-                </div>
+                </div> */}
             </div>);
     }
 

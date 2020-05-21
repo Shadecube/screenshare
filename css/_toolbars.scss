@@ -56,12 +56,13 @@
     .toolbox-content {
         box-sizing: border-box;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         margin-left: auto;
         margin-right: auto;
         padding: 20px 16px;
         position: relative;
         width: 100%;
+        height: 100%;
         z-index: $toolbarZ;
 
         .button-group-center,
@@ -70,7 +71,12 @@
             display: flex;
             width: 33%;
         }
-
+        .button-group-left{
+            position: fixed;
+            top: 170px;
+            width: auto;
+            left: 10px;
+        }
         .button-group-center {
             justify-content: center;
 
@@ -140,6 +146,7 @@
             font-size: 1.2em;
             list-style-type: none;
             background-color: $overflowMenuBG;
+            
             /**
              * Undo atlaskit padding by reducing margins.
              */

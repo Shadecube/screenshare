@@ -110,6 +110,10 @@ form {
     background-size: contain;
     background-repeat: no-repeat;
     z-index: $zindex2;
+    @media all and (max-width: 640px) {
+        width: 70px;
+        height: 70px;
+    } 
 }
 
 .leftwatermark {
@@ -117,6 +121,10 @@ form {
     top: 32px;
     background-image: url($defaultWatermarkLink);
     background-position: center left;
+    @media all and (max-width: 640px) {
+        left: 15px;
+        top: 15px;
+    }
 }
 
 .rightwatermark {
