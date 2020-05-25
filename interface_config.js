@@ -215,12 +215,12 @@ var interfaceConfig = {
 	/**
      * If true, presence status: busy, calling, connected etc. is not displayed.
      */
-	DISABLE_PRESENCE_STATUS: false,
+	DISABLE_PRESENCE_STATUS: true,
 
 	/**
      * If true, notifications regarding joining/leaving are no longer displayed.
      */
-	DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+	DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
 
 	/**
     * Decides whether the chrome extension banner should be rendered on the landing page and during the meeting.
