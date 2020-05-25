@@ -111,7 +111,7 @@ class MoreTab extends AbstractDialogTab<Props, State> {
         const { showModeratorSettings, showLanguageSettings } = this.props;
         const content = [];
 
-        if (showModeratorSettings) {
+        if (showModeratorSettings && false) {
             content.push(this._renderModeratorSettings());
         }
 

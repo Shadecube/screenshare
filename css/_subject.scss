@@ -1,3 +1,13 @@
+@mixin mdScr {
+    @media all and (max-width: 992px) {
+        @content;
+    } 
+}
+@mixin smScr {
+    @media all and (max-width: 640px) {
+        @content;
+    } 
+}
 .subject {
     top: -120px;
     transition: top .3s ease-in;
@@ -10,12 +20,15 @@
     font-size: 17px;
     color: #fff;
     z-index: $zindex10;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     box-sizing: border-box;
     white-space: nowrap;
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
 
+    @include smScr {
+        padding-left: 90px;
+    } 
     &.visible {
         top: 0px;
     }
@@ -28,5 +41,271 @@
         display: block;
         font-size: 15px;
         opacity: 0.6;
+    }
+
+    .toolbox-content {
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px 16px;
+        position: relative;
+        width: 100%;
+        height: auto;
+        align-items: center;
+        z-index: $toolbarZ;
+        @include mdScr {
+            flex-wrap: wrap;
+        }
+        @include smScr {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .button-group-center,
+        .button-group-left,
+        .button-group-right {
+            display: flex;
+            // width: 33%;
+            width: auto;
+            pointer-events: all;
+  
+        }
+        .button-group-left,
+        .button-group-right {
+            width: 33%;
+            @include mdScr {
+                width: 50%;
+                order: 2;
+            }
+        }
+        .button-group-right {
+            @include smScr {
+                width: 40px;
+                order: 0;
+            }
+        }
+        .button-group-left{
+            justify-content: flex-end;
+            @include smScr {
+                display: none;
+            }
+        }
+        .button-group-center{
+            padding-left: 5px;
+            padding-right: 5px;
+            @include mdScr {
+                width: 100%;
+                order: 1;
+            }
+            @include smScr {
+                order: 2;
+                width: auto;
+                max-width: calc(100% - 50px);
+            }
+        }
+        .button-group-center {
+            justify-content: center;
+
+            .toolbox-button {
+
+                .toolbox-icon {
+                    background-color: #fff;
+                    border-radius: 50%;
+                    border: 1px solid #d1dbe8;
+                    margin: 0px 4px;
+                    width: 38px;
+                    height: 38px;
+        
+                    &:hover {
+                        background-color: #daebfa;
+                        border: 1px solid #daebfa;
+                    }
+        
+                    &.toggled {
+                        background: #2a3a4b;
+                        border: 1px solid #5e6d7a;
+    
+                        svg {
+                            fill: #fff;
+                        }
+        
+                        &:hover {
+                            background-color: #5e6d7a;
+                        }
+                    }
+        
+                    &.disabled, .disabled & {
+                        cursor: initial;
+                        color: #fff;
+                        background-color: #a4b8d1;
+                    }
+    
+                    svg {
+                        fill: #5e6d7a;
+                    }
+                }
+
+                &:nth-child(2) {
+                    .toolbox-icon {
+                        background-color: $hangupColor;
+                        border: 1px solid $hangupColor;
+                        width: 40px;
+                        height: 40px;
+                
+                        &:hover {
+                            background-color: $hangupColor;
+                        }
+
+                        svg {
+                            fill: #fff;
+                        }
+                    }
+                }
+            }
+        }
+
+        .button-group-right {
+            justify-content: flex-start;
+        }
+
+        .overflow-menu {
+            font-size: 1.2em;
+            list-style-type: none;
+            background-color: $overflowMenuBG;
+            
+            /**
+             * Undo atlaskit padding by reducing margins.
+             */
+            margin: -16px -24px;
+            padding: 4px 0;
+            max-height: calc(100vh - 180px);
+            overflow: auto;
+
+            .overflow-menu-item {
+                align-items: center;
+                color: $overflowMenuItemColor;
+                cursor: pointer;
+                display: flex;
+                font-size: 14px;
+                height: 22px;
+                padding: 5px 12px;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                }
+
+                &:hover {
+                    background-color: $overflowMenuItemHoverBG;
+                    color: $overflowMenuItemHoverColor;
+                }
+
+                &.unclickable {
+                    cursor: default;
+                }
+                &.unclickable:hover {
+                    background: inherit;
+                }
+                &.disabled {
+                    cursor: initial;
+                    color: #3b475c;
+                }
+            }
+
+            .beta-tag {
+                background: $overflowMenuItemColor;
+                border-radius: 2px;
+                color: $overflowMenuBG;
+                font-size: 11px;
+                font-weight: bold;
+                margin-left: 8px;
+                padding: 0 6px;
+            }
+
+            .overflow-menu-item-icon {
+                margin-right: 10px;
+
+                i {
+                    display: inline;
+                    font-size: 24px;
+                }
+
+                i:hover {
+                    background-color: initial;
+                }
+
+                img {
+                    max-width: 24px;
+                    max-height: 24px;
+                }
+
+                svg {
+                    fill: #B8C7E0 !important;
+                }
+            }
+
+            .profile-text {
+                max-width: 150px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+        }
+
+        .toolbox-button {
+            color: $toolbarButtonColor;
+            cursor: pointer;
+            display: inline-block;
+            line-height: $newToolbarSize;
+            margin: 0 8px;
+            text-align: center;
+            @include smScr{
+                margin: 0;
+            }
+        }
+
+        .toolbar-button-with-badge {
+            position: relative;
+
+            .badge-round {
+                bottom: -5px;
+                font-size: 12px;
+                line-height: 20px;
+                min-width: 20px;
+                pointer-events: none;
+                position: absolute;
+                right: -5px;
+            }
+        }
+
+        .toolbox-button-wth-dialog {
+            display: inline-block;
+        }
+
+        .toolbox-icon {
+            display: flex;
+            border-radius: 5px;
+            flex-direction: column;
+            font-size: 24px;
+            height: $newToolbarSize;
+            justify-content: center;
+            width: $newToolbarSize;
+
+            &:hover, &.toggled {
+                background: $newToolbarButtonHoverColor;
+            }
+    
+            &.disabled {
+                cursor: initial !important;
+                background-color: #a4b8d1 !important;
+
+                svg {
+                    fill: #fff !important;
+                }
+            }
+        }
     }
 }

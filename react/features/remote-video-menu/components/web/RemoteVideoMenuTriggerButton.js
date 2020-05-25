@@ -190,14 +190,14 @@ class RemoteVideoMenuTriggerButton extends Component<Props> {
                     key = 'mute-others'
                     participantID = { participantID } />
             );
-        }
-        if (_isModerator) {
-            
             buttons.push(
                 <KickButton
                     key = 'kick'
                     participantID = { participantID } />
             );
+        }
+        if (_isModerator) {
+            
         }
 
         if (remoteControlState) {

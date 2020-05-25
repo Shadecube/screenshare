@@ -51,7 +51,8 @@ import {
     p2pStatusChanged,
     sendLocalParticipant,
     setDesktopSharingEnabled,
-    shadeCubeApis
+    shadeCubeApis,
+    CHAT_CODE
 } from './react/features/base/conference';
 import {
     checkAndNotifyForNewDevice,
@@ -126,6 +127,7 @@ import { endpointMessageReceived } from './react/features/subtitles';
 import { createRnnoiseProcessorPromise } from './react/features/rnnoise';
 import { toggleScreenshotCaptureEffect } from './react/features/screenshot-capture';
 import { changeShadeCubeCheckFlag } from './react/features/shade-cube-auth';
+import { sendMessage } from './react/features/chat';
 
 const logger = require('jitsi-meet-logger').getLogger(__filename);
 
@@ -2690,13 +2692,13 @@ export default {
         const participant = getLocalParticipant(state)
         if(participant){
             if(participant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR){
-                const token = state['features/shade-cube-auth'].token
+                // const token = state['features/shade-cube-auth'].token
                 const room = state['features/base/conference'].room
                 
                 await fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
                     method: "PUT",
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        // Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -2704,7 +2706,8 @@ export default {
                         "is_active": false
                     })
                 }).then(res => res.json())
-
+                
+                APP.store.dispatch(sendMessage(CHAT_CODE.EVERYONE_OUT_FROM_ROOM));
                 APP.store.dispatch(changeShadeCubeCheckFlag())
                 
             }

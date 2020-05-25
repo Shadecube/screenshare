@@ -11,7 +11,8 @@ import { Icon, IconInfo, IconCopy } from '../../../../base/icons';
 import { connect } from '../../../../base/redux';
 import {
     isLocalParticipantModerator,
-    getLocalParticipant
+    getLocalParticipant,
+    PARTICIPANT_ROLE
 } from '../../../../base/participants';
 
 import {
@@ -629,7 +630,8 @@ function _mapStateToProps(state) {
     const localParticipant = getLocalParticipant(state);
 
     return {
-        _canEditPassword: isLocalParticipantModerator(state, state['features/base/config'].lockRoomGuestEnabled),
+        // _canEditPassword: isLocalParticipantModerator(state, state['features/base/config'].lockRoomGuestEnabled),
+        _canEditPassword: Boolean(localParticipant?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR),
         _conference: conference,
         _conferenceName: room,
         _passwordNumberOfDigits: state['features/base/config'].roomPasswordNumberOfDigits,
