@@ -396,7 +396,10 @@ class Subject extends Component<Props, State> {
         const { _showParticipantCount, _subject, _visible, _visibleButtons } = this.props;
 
         return (
-            <div className = { `subject ${_visible ? 'visible' : ''}` }>
+            <div
+             onMouseOut = { this._onMouseOut }
+             onMouseOver = { this._onMouseOver }
+             className = { `subject ${_visible ? 'visible' : ''}` }>
                 {/* <span className = 'subject-text'>{ _subject }</span>
                 { _showParticipantCount && <ParticipantsCount /> }
                 <ConferenceTimer /> */}
