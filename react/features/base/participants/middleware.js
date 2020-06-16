@@ -134,35 +134,35 @@ MiddlewareRegistry.register(store => next => action => {
                     && p.conference === conference
                     && (conference || p.local)))
         const isMorderatorFound = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
-        if(!isMorderatorFound){
-            // window.location.href = "/"
-            setTimeout(() => {
-                const filterdState = getParticipants(store.getState()).filter(p =>
-                    !( p.id === id
-                        && p.conference === conference
-                        && (conference || p.local)))
-                const nextCheck = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
-                if(!nextCheck){
-                    const room  = store.getState()['features/base/conference'].room;
-                    fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
-                        method: "PUT",
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: room,
-                            "is_active": false
-                        })
-                    }).then(res => res.json())
-                    .then(() => {
-                        window.location.href = "/"
-                    })
-                    .catch(()=> {
-                        window.location.href = "/"
-                    })
-                }
-            }, 60 * 1000);
-        }
+        // if(!isMorderatorFound){
+        //     // window.location.href = "/"
+        //     setTimeout(() => {
+        //         const filterdState = getParticipants(store.getState()).filter(p =>
+        //             !( p.id === id
+        //                 && p.conference === conference
+        //                 && (conference || p.local)))
+        //         const nextCheck = filterdState.some(p => p?.shadeCubeRole === PARTICIPANT_ROLE.MODERATOR)   
+        //         if(!nextCheck){
+        //             const room  = store.getState()['features/base/conference'].room;
+        //             fetch(`${shadeCubeApis.CONFERENCE_API}/${room}/`, {
+        //                 method: "PUT",
+        //                 headers: {
+        //                     'Content-Type': 'application/json'
+        //                 },
+        //                 body: JSON.stringify({
+        //                     name: room,
+        //                     "is_active": false
+        //                 })
+        //             }).then(res => res.json())
+        //             .then(() => {
+        //                 window.location.href = "/"
+        //             })
+        //             .catch(()=> {
+        //                 window.location.href = "/"
+        //             })
+        //         }
+        //     }, 60 * 1000);
+        // }
         _maybePlaySounds(store, action);
         break;
 
