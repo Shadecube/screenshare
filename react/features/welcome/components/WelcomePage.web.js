@@ -256,6 +256,7 @@ class WelcomePage extends AbstractWelcomePage {
 							<button class="btn login-button oru-login" onClick={this._oruLogin}>LOGIN</button>
 							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}>REGISTER</button>
 							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}>ORUMEDIA</button>
+						<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}>YOUTUBE SIMULCAST</button>
 					</div>
 				</div>
 				<div class="login-modal" style={modalStyle}>
@@ -601,6 +602,10 @@ class WelcomePage extends AbstractWelcomePage {
 
 	_oruLoginCancel() {
 		document.getElementsByClassName('login-modal')[0].style.display = 'none';
+	}
+
+	_shadecubeSimulcast() {
+		window.open('https://shadecube.com/tutorial/youtube-simulcast','_blank');
 	}
 }
 

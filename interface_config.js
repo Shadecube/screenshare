@@ -126,7 +126,7 @@ var interfaceConfig = {
 	LOCAL_THUMBNAIL_RATIO: 16 / 9, // 16:9
 	REMOTE_THUMBNAIL_RATIO: 1, // 1:1
 	// Documentation reference for the live streaming feature.
-	LIVE_STREAMING_HELP_LINK: 'https://shadecube.com/pricing',
+	LIVE_STREAMING_HELP_LINK: 'https://shadecube.com/tutorial/youtube-simulcast',
 
 	/**
      * Whether the mobile app Jitsi Meet is to be promoted to participants
