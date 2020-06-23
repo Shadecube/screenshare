@@ -253,12 +253,12 @@ class WelcomePage extends AbstractWelcomePage {
 						</div>
 					</div>
 					<div class="row login-buttons-row">
-							<button class="btn login-button oru-login" onClick={this._oruLogin}>LOGIN</button>
-							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}>REGISTER</button>
-							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}>ORUMEDIA</button>
-						<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}>YOUTUBE SIMULCAST</button>
+						<button class="btn login-button oru-login" onClick={this._oruLogin}><img style={{ width: "21px", float: "left" }} src="images/lock.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>LOGIN</span></button>
+							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}><img style={{width: "31px",float:"left"}} src="images/register.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>REGISTER</span></button>
+							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}><img style={{width: "31px",float:"left"}} src="images/orumedia.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>ORUMEDIA</span></button>
+						<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}><img style={{width: "31px",float:"left"}} src="images/youtube-ico.png"></img>YOUTUBE SIMULCAST</button>
 					</div>
-				</div>
+				</div>	
 				<div class="login-modal" style={modalStyle}>
 					<h2 style={{width: '100%',textAlign : "center", margin:"10px",color: "black"}}>LOGIN</h2>
 					<input type="text" placeholder="ORU USERNAME" className="enter-room-input" style={modalInputStyle} id="oru-username"></input>
