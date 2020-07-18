@@ -256,7 +256,8 @@ class WelcomePage extends AbstractWelcomePage {
 						<button class="btn login-button oru-login" onClick={this._oruLogin}><img style={{ width: "21px", float: "left" }} src="images/lock.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>LOGIN</span></button>
 							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}><img style={{width: "31px",float:"left"}} src="images/register.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>REGISTER</span></button>
 							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}><img style={{width: "31px",float:"left"}} src="images/orumedia.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>ORUMEDIA</span></button>
-						<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}><img style={{width: "31px",float:"left"}} src="images/youtube-ico.png"></img>YOUTUBE SIMULCAST</button>
+							<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}><img style={{ width: "31px", float: "left" }} src="images/youtube-ico.png"></img>YOUTUBE SIMULCAST</button>
+							<button class="btn login-button contribute-oru" onClick={this._contributeOru}><img style={{width: "31px",float:"left"}} src="images/donation.png"></img><span style={{display: "inline-block","margin-top": "6px"}}>CONTRIBUTE</span></button>
 					</div>
 				</div>	
 				<div class="login-modal" style={modalStyle}>
@@ -606,6 +607,10 @@ class WelcomePage extends AbstractWelcomePage {
 
 	_shadecubeSimulcast() {
 		window.open('https://shadecube.com/tutorial/youtube-simulcast','_blank');
+	}
+
+	_contributeOru() {
+		window.open('https://shadecube.com/contribute','_blank');
 	}
 }
 
