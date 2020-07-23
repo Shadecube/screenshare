@@ -3,8 +3,8 @@ body.welcome-page {
 	overflow: auto;
 }
 .tOoji{
-	background: rgb(55,57,204);
-	background: linear-gradient(90deg, rgba(55,57,204,1) 0%, rgba(0,251,255,1) 100%);
+	background: rgb(254,215,18);
+	background: linear-gradient(45deg, rgba(254,215,18,1) 0%, rgba(254,215,18,1) 40%, rgba(254,215,18,0.8449754901960784) 100%);
 }
 .tOoji h4{
 	color:white !important;
@@ -160,7 +160,7 @@ body.welcome-page {
 		height: $welcomePageButtonHeight;
 		font-size: $welcomePageButtonFontSize;
 		font-weight: $welcomePageButtonFontWeight;
-		background: #0074e0;
+		background: black;
 		border-radius: $welcomePageButtonBorderRadius;
 		color: #ffffff;
 		text-align: center;
@@ -194,6 +194,7 @@ body.welcome-page {
   width: 150px;
 	height: 50px;
 	padding: 9px;
+	background-color: black;
 }
 .login-buttons-row{
 	width: 780px;

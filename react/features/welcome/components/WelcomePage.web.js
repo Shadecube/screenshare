@@ -149,10 +149,6 @@ class WelcomePage extends AbstractWelcomePage {
 		this._setRoomInputRef = this._setRoomInputRef.bind(this);
 		this._setAdditionalToolbarContentRef = this._setAdditionalToolbarContentRef.bind(this);
 		this._onTabSelected = this._onTabSelected.bind(this);
-		this._orumediaRedirect = this._orumediaRedirect.bind(this);
-		this._oruregisterRedirect = this._oruregisterRedirect.bind(this);
-		this._oruLogin = this._oruLogin.bind(this);
-		this._oruLoginSubmit = this._oruLoginSubmit.bind(this);
 	}
 
 	/**
@@ -222,7 +218,7 @@ class WelcomePage extends AbstractWelcomePage {
 					</div>
 					<div className="header-image" />
 					<div className='header-text'>
-							<h1 className = 'header-text-title'>Welcome to ShadeCube</h1>
+							<h1 className = 'header-text-title'>Welcome to Skool Mii</h1>
 							<h4>
 									{ t('welcomepage.title') }
 							</h4>
@@ -252,24 +248,7 @@ class WelcomePage extends AbstractWelcomePage {
 							{showResponsiveText ? t('welcomepage.goSmall') : t('welcomepage.go')}
 						</div>
 					</div>
-					<div class="row login-buttons-row">
-						<button class="btn login-button oru-login" onClick={this._oruLogin}><img style={{ width: "21px", float: "left" }} src="images/lock.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>LOGIN</span></button>
-							<button class="btn login-button oru-register" onClick={this._oruregisterRedirect}><img style={{width: "31px",float:"left"}} src="images/register.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>REGISTER</span></button>
-							<button class="btn login-button oru-media" onClick={this._orumediaRedirect}><img style={{width: "31px",float:"left"}} src="images/orumedia.png"></img><span style={{display: "inline-block","margin-top": "4px"}}>ORUMEDIA</span></button>
-							<button class="btn login-button youtube-simulcast" onClick={this._shadecubeSimulcast}><img style={{ width: "31px", float: "left" }} src="images/youtube-ico.png"></img>YOUTUBE SIMULCAST</button>
-							<button class="btn login-button contribute-oru" onClick={this._contributeOru}><img style={{width: "31px",float:"left"}} src="images/donation.png"></img><span style={{display: "inline-block","margin-top": "6px"}}>CONTRIBUTE</span></button>
-					</div>
 				</div>	
-				<div class="login-modal" style={modalStyle}>
-					<h2 style={{width: '100%',textAlign : "center", margin:"10px",color: "black"}}>LOGIN</h2>
-					<input type="text" placeholder="ORU USERNAME" className="enter-room-input" style={modalInputStyle} id="oru-username"></input>
-					<span id="login-error-message" style={{color:"red",display: "none"}}>Invalid Username or Password</span>
-					<input type="password" placeholder="ORU PASSWORD" className="enter-room-input" style={modalInputStyle} id="oru-password"></input>
-					<div style={{ textAlign:"center", width:"100%", display: "flex", marginTop : '20px'}}>
-						<button class="btn oru-login-subit" onClick={this._oruLoginSubmit} style={oruButtonsNew}>LOGIN</button>
-						<button class="btn oru-login-cancel" onClick={this._oruLoginCancel} style={oruButtonsCancel}>CLOSE</button>
-					</div>
-				</div>
 				{showAdditionalContent ? (
 					<div className="welcome-page-content" ref={this._setAdditionalContentRef} />
 				) : null}
@@ -541,76 +520,6 @@ class WelcomePage extends AbstractWelcomePage {
 		const { innerWidth } = window;
 
 		return innerWidth <= WINDOW_WIDTH_THRESHOLD;
-	}
-
-	_orumediaRedirect() {
-		window.location.href = 'https://orumedia.com/';
-	}
-
-	_oruregisterRedirect() {
-		window.location.href = 'https://www.orumarketplace.com/register.php';
-	}
-
-	_oruLogin() {
-		document.getElementsByClassName('login-modal')[0].style.display = 'block';
-	}
-
-	async _oruMarketLogin() {
-		let uname = document.getElementById('oru-username').value;
-		let pass = document.getElementById('oru-password').value;
-		let formData = new FormData();
-		formData.append('action','mdLn');
-		formData.append('nl',uname);
-		formData.append('dp',pass);
-		let response = await fetch(`https://www.orumarketplace.com/orutv.php`, {
-			method: 'POST',
-			mode: 'cors',
-			cache: 'no-cache',
-			body: formData
-		});
-		return response.json();
-	}
-
-	async _getChatToken(uname,pass) {
-		let response = await fetch(`https://engine.shadecubecommunicator.com/accounts/login/`, {
-			method: 'POST',
-			mode: 'cors',
-			cache: 'no-cache',
-			headers:{
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				username:uname,
-				password:pass,
-				company_id:1
-			})
-		});
-		return response.json();
-	}
-
-	_oruLoginSubmit() {
-		this._oruMarketLogin().then((res) => {
-			if (!res.status) {
-				document.getElementById('login-error-message').style.display = 'block';
-			} else {
-				document.getElementById('login-error-message').style.display = 'none';
-				this._getChatToken(res.data.ec, res.data.pc).then((res) => {
-					window.location.href = '/?token=' + res.access;
-				})
-			}
-		});
-	}
-
-	_oruLoginCancel() {
-		document.getElementsByClassName('login-modal')[0].style.display = 'none';
-	}
-
-	_shadecubeSimulcast() {
-		window.open('https://shadecube.com/tutorial/youtube-simulcast','_blank');
-	}
-
-	_contributeOru() {
-		window.open('https://shadecube.com/contribute','_blank');
 	}
 }
 
